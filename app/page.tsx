@@ -1,239 +1,1109 @@
+const features = [
+  {
+    number: "01",
+    title: "Personalized Learning",
+    description:
+      "Build your preparation around the four subjects you actually selected for JAMB. Study topics, resources and materials in a structured learning environment.",
+    icon: "book",
+  },
+  {
+    number: "02",
+    title: "Real CBT Practice",
+    description:
+      "Practise with timed computer-based tests designed to help you become familiar with the pressure, speed and discipline required during JAMB.",
+    icon: "monitor",
+  },
+  {
+    number: "03",
+    title: "JAMB Battle Arena",
+    description:
+      "Challenge other students in competitive JAMB battles. Compete one-on-one or against groups and see how you perform under pressure.",
+    icon: "swords",
+  },
+  {
+    number: "04",
+    title: "AI JAMB Coach",
+    description:
+      "Get intelligent guidance that can explain difficult questions, identify learning gaps, recommend practice and help organize your preparation.",
+    icon: "spark",
+  },
+  {
+    number: "05",
+    title: "Performance Analytics",
+    description:
+      "Understand your preparation with performance trends, subject mastery, strengths, weaknesses and recommendations for improvement.",
+    icon: "chart",
+  },
+  {
+    number: "06",
+    title: "Student Community",
+    description:
+      "Connect with other JAMB candidates, share achievements, encourage friends, create challenges and become part of a preparation community.",
+    icon: "users",
+  },
+];
+
+const journey = [
+  {
+    number: "01",
+    title: "Create your student profile",
+    text: "Tell JAMBMASTER about your JAMB year, target university, course, target score and academic goals.",
+  },
+  {
+    number: "02",
+    title: "Choose your four subjects",
+    text: "Your learning environment is organized around the four subjects you will take in JAMB.",
+  },
+  {
+    number: "03",
+    title: "Learn your topics",
+    text: "Study structured topics using educational materials, resources, videos and guided learning.",
+  },
+  {
+    number: "04",
+    title: "Practise continuously",
+    text: "Move from learning to questions and timed CBTs until answering becomes faster and more confident.",
+  },
+  {
+    number: "05",
+    title: "Battle and compete",
+    text: "Challenge other students and use competition as another way to test your knowledge and consistency.",
+  },
+  {
+    number: "06",
+    title: "Analyze and improve",
+    text: "Use your performance data to discover where you are strong, where you need work and what to study next.",
+  },
+];
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
-      {/* Navigation */}
-      <header className="border-b border-gray-100">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-blue-700">
-              JAMBMASTER
-            </h1>
-            <p className="text-xs text-gray-500">
-              Prepare. Practice. Compete. Improve.
-            </p>
-          </div>
+    <main className="overflow-hidden bg-[#faf9ff] text-[#171321]">
+      {/* NAVIGATION */}
+      <header className="site-header">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+          <a href="/" className="flex items-center gap-3">
+            {/* Cloudinary logo will replace this placeholder */}
+            <div className="logo-placeholder">
+              LOGO
+            </div>
 
-          <div className="flex items-center gap-3">
+            <div>
+              <div className="text-xl font-black tracking-tight text-[#24113f]">
+                JAMB<span className="text-[#7c3aed]">MASTER</span>
+              </div>
+              <div className="hidden text-[9px] font-semibold uppercase tracking-[0.2em] text-[#81778e] sm:block">
+                Prepare. Battle. Succeed.
+              </div>
+            </div>
+          </a>
+
+          <nav className="hidden items-center gap-7 text-sm font-semibold text-[#62586e] lg:flex">
+            <a href="#about" className="nav-link">
+              About
+            </a>
+            <a href="#features" className="nav-link">
+              Features
+            </a>
+            <a href="#journey" className="nav-link">
+              How It Works
+            </a>
+            <a href="#mission" className="nav-link">
+              Our Mission
+            </a>
+          </nav>
+
+          <div className="flex items-center gap-2 sm:gap-3">
             <a
               href="/login"
-              className="hidden rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 sm:block"
+              className="hidden rounded-xl px-4 py-2.5 text-sm font-bold text-[#493b59] transition hover:bg-white sm:block"
             >
               Log in
             </a>
 
             <a
               href="/signup"
-              className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800"
+              className="rounded-xl bg-[#6d28d9] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-purple-900/15 transition hover:-translate-y-0.5 hover:bg-[#5b21b6] sm:px-5"
             >
-              Get Started
+              Start Free
             </a>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="bg-gradient-to-b from-blue-50 to-white">
-        <div className="mx-auto max-w-7xl px-6 py-20 text-center sm:py-28">
-          <div className="mx-auto mb-6 inline-flex rounded-full border border-blue-100 bg-white px-4 py-2 text-sm font-medium text-blue-700 shadow-sm">
-            The smarter way to prepare for JAMB
+      {/* HERO */}
+      <section className="hero-section relative">
+        <div className="hero-orb hero-orb-one" />
+        <div className="hero-orb hero-orb-two" />
+
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:py-20 lg:grid-cols-[1.02fr_.98fr] lg:px-8 lg:py-28">
+          <div className="relative z-10 fade-up">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-purple-200 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#6d28d9] shadow-sm backdrop-blur">
+              <span className="status-dot" />
+              Built for JAMB students
+            </div>
+
+            <h1 className="max-w-4xl text-5xl font-black leading-[0.98] tracking-[-0.045em] text-[#21132f] sm:text-6xl lg:text-[76px]">
+              Battle JAMB.
+              <br />
+              <span className="gradient-text">Overcome Failure.</span>
+              <br />
+              Achieve Your Score.
+            </h1>
+
+            <p className="mt-7 max-w-2xl text-base leading-7 text-[#675d72] sm:text-lg sm:leading-8">
+              JAMBMASTER is a complete preparation platform built to help
+              students learn smarter, practise consistently, compete with
+              confidence and understand exactly where they need to improve.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="/signup"
+                className="primary-button group"
+              >
+                Start Preparing Free
+                <span className="button-arrow">→</span>
+              </a>
+
+              <a
+                href="#about"
+                className="secondary-button"
+              >
+                Explore JAMBMASTER
+              </a>
+            </div>
+
+            <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-sm font-semibold text-[#6c6278]">
+              <div className="flex items-center gap-2">
+                <span className="check-circle">✓</span>
+                Learn
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="check-circle">✓</span>
+                Practise
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="check-circle">✓</span>
+                Battle
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="check-circle">✓</span>
+                Improve
+              </div>
+            </div>
           </div>
 
-          <h2 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-gray-900 sm:text-6xl">
-            Prepare for JAMB with
-            <span className="text-blue-700"> confidence.</span>
-          </h2>
+          {/* HERO VISUAL */}
+          <div className="relative mx-auto w-full max-w-[570px] lg:ml-auto fade-up delay-one">
+            <div className="hero-image-wrap">
+              {/* Temporary image. This will later come from the JAMBMASTER Cloudinary Media Manager. */}
+              <img
+                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=85"
+                alt="Students studying together"
+                className="hero-image"
+              />
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-            Study your four JAMB subjects, practise with realistic CBTs,
-            compete with other students, track your progress and improve your
-            score.
-          </p>
+              <div className="hero-image-overlay" />
 
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <a
-              href="/signup"
-              className="rounded-xl bg-blue-700 px-7 py-4 font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800"
-            >
-              Start Preparing
-            </a>
+              <div className="hero-caption">
+                <div className="text-xs font-bold uppercase tracking-[0.16em] text-white/70">
+                  Your preparation
+                </div>
+                <div className="mt-1 text-xl font-black text-white">
+                  Starts with a system.
+                </div>
+              </div>
+            </div>
 
-            <a
-              href="#features"
-              className="rounded-xl border border-gray-200 bg-white px-7 py-4 font-bold text-gray-700 transition hover:bg-gray-50"
-            >
-              Explore JAMBMASTER
-            </a>
+            <div className="floating-card floating-score">
+              <div className="flex items-center justify-between gap-6">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#83768f]">
+                    Target Score
+                  </p>
+                  <p className="mt-1 text-2xl font-black text-[#261532]">
+                    300+
+                  </p>
+                </div>
+
+                <div className="score-ring">
+                  <span>↑</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="floating-card floating-battle">
+              <div className="flex items-center gap-3">
+                <div className="battle-icon">⚔</div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#83768f]">
+                    JAMB Battle
+                  </p>
+                  <p className="mt-0.5 text-sm font-black text-[#261532]">
+                    Ready to compete?
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="hero-decoration">
+              <span />
+              <span />
+              <span />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Core System */}
-      <section id="features" className="px-6 py-20">
+      {/* PROBLEM */}
+      <section className="bg-[#21132f] px-5 py-20 text-white sm:py-24">
         <div className="mx-auto max-w-7xl">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="font-semibold text-blue-700">ONE PLATFORM</p>
+          <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
+            <div>
+              <p className="section-eyebrow section-eyebrow-light">
+                The reality
+              </p>
 
-            <h3 className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Everything you need to prepare
-            </h3>
+              <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
+                JAMB should not decide your future because you were not
+                properly prepared.
+              </h2>
+            </div>
 
-            <p className="mt-4 text-gray-600">
-              JAMBMASTER brings learning, practice, competition and
-              performance tracking into one platform.
+            <div>
+              <p className="max-w-2xl text-base leading-8 text-white/65 sm:text-lg">
+                Many students do not fail because they cannot learn. They
+                struggle because preparation can be scattered, stressful and
+                difficult to measure. JAMBMASTER brings the important parts of
+                preparation into one connected experience.
+              </p>
+
+              <div className="mt-7 grid gap-3 sm:grid-cols-3">
+                <div className="dark-mini-card">
+                  <strong>Learn</strong>
+                  <span>with structure</span>
+                </div>
+
+                <div className="dark-mini-card">
+                  <strong>Practise</strong>
+                  <span>with purpose</span>
+                </div>
+
+                <div className="dark-mini-card">
+                  <strong>Improve</strong>
+                  <span>with evidence</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="px-5 py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div className="relative">
+              <div className="about-image-frame">
+                <img
+                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=85"
+                  alt="Students learning together"
+                  className="about-image"
+                />
+              </div>
+
+              <div className="about-note">
+                <span className="about-note-icon">★</span>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#81758d]">
+                    The goal
+                  </p>
+                  <p className="mt-1 font-black text-[#291638]">
+                    Make preparation easier.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p className="section-eyebrow">What is JAMBMASTER?</p>
+
+              <h2 className="section-title">
+                A preparation ecosystem built around the student.
+              </h2>
+
+              <p className="section-copy">
+                JAMBMASTER is designed to become a student&apos;s complete
+                preparation environment for JAMB. Instead of jumping between
+                different resources, practice platforms, communities and
+                tutors, students can have their preparation organized in one
+                place.
+              </p>
+
+              <p className="section-copy">
+                From selecting four subjects and setting a target score to
+                studying topics, taking CBTs, battling other students and
+                analyzing performance, every part of the experience is designed
+                around one objective: helping students become better prepared.
+              </p>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                <div className="about-point">
+                  <span>01</span>
+                  <div>
+                    <strong>Student-first</strong>
+                    <p>Built around how students actually prepare.</p>
+                  </div>
+                </div>
+
+                <div className="about-point">
+                  <span>02</span>
+                  <div>
+                    <strong>Data-driven</strong>
+                    <p>Use performance to understand what comes next.</p>
+                  </div>
+                </div>
+
+                <div className="about-point">
+                  <span>03</span>
+                  <div>
+                    <strong>Competitive</strong>
+                    <p>Turn preparation into healthy competition.</p>
+                  </div>
+                </div>
+
+                <div className="about-point">
+                  <span>04</span>
+                  <div>
+                    <strong>Personal</strong>
+                    <p>Your subjects, goals, pace and progress matter.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* METHOD */}
+      <section className="method-section px-5 py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="section-eyebrow">The JAMBMASTER method</p>
+
+            <h2 className="section-title">
+              Learn. Practise. Compete. Analyze. Improve.
+            </h2>
+
+            <p className="section-copy mx-auto">
+              Preparation becomes more powerful when every activity connects
+              to the next one.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Feature
+          <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            <MethodCard
               number="01"
               title="Learn"
-              description="Access structured materials and study resources for your selected JAMB subjects."
+              text="Build knowledge through structured subjects, topics, materials, resources and educational videos."
             />
 
-            <Feature
+            <MethodCard
               number="02"
               title="Practise"
-              description="Test yourself with timed CBT practice designed around your JAMB preparation."
+              text="Reinforce what you learn with questions, topic practice and realistic timed CBT experiences."
             />
 
-            <Feature
+            <MethodCard
               number="03"
               title="Compete"
-              description="Challenge other students and compete in timed JAMB battles."
+              text="Challenge yourself against other students and turn preparation into a motivating experience."
             />
 
-            <Feature
+            <MethodCard
               number="04"
               title="Improve"
-              description="Understand your performance, identify weak areas and focus your preparation."
+              text="Understand your results, identify weak areas and use your data to prepare more intelligently."
             />
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="bg-gray-50 px-6 py-20">
+      {/* FEATURES */}
+      <section id="features" className="px-5 py-20 sm:py-28">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="font-semibold text-blue-700">HOW IT WORKS</p>
+          <div className="max-w-3xl">
+            <p className="section-eyebrow">Everything in one place</p>
 
-              <h3 className="mt-3 text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                Your preparation has a clear path.
-              </h3>
+            <h2 className="section-title">
+              More than CBT practice.
+              <br />
+              A complete JAMB experience.
+            </h2>
 
-              <p className="mt-5 leading-7 text-gray-600">
-                From the moment you create your account, JAMBMASTER is built
-                around the subjects and goals you choose.
-              </p>
-            </div>
+            <p className="section-copy">
+              JAMBMASTER combines learning, testing, competition, artificial
+              intelligence, analytics, community and tutoring into one
+              student-centered platform.
+            </p>
+          </div>
 
-            <div className="space-y-4">
-              <Step
-                number="1"
-                title="Create your account"
-                description="Set up your student profile and tell us what you are preparing for."
+          <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature) => (
+              <FeatureCard
+                key={feature.number}
+                number={feature.number}
+                title={feature.title}
+                description={feature.description}
+                icon={feature.icon}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* LEARNING FEATURE */}
+      <section className="feature-showcase px-5 py-20 sm:py-28">
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
+          <div className="order-2 lg:order-1">
+            <p className="section-eyebrow">01 / Learn</p>
+
+            <h2 className="section-title">
+              Your four subjects.
+              <br />
+              Your preparation.
+            </h2>
+
+            <p className="section-copy">
+              JAMBMASTER starts by understanding what you are preparing for.
+              Students select their four JAMB subjects and build their
+              preparation around them.
+            </p>
+
+            <ul className="feature-list">
+              <li>Structured JAMB topics and learning paths</li>
+              <li>E-textbooks and study resources</li>
+              <li>Educational videos and materials</li>
+              <li>Personal study goals and progress</li>
+              <li>Topic-focused preparation</li>
+            </ul>
+          </div>
+
+          <div className="order-1 lg:order-2">
+            <div className="feature-image-card">
+              <img
+                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85"
+                alt="Student studying on a laptop"
+                className="feature-image"
               />
 
-              <Step
-                number="2"
-                title="Choose your four subjects"
-                description="Your learning experience is organized around your actual JAMB subject combination."
-              />
+              <div className="subject-panel">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#8a7d96]">
+                  Your subjects
+                </p>
 
-              <Step
-                number="3"
-                title="Study and practise"
-                description="Learn topics, practise questions and take realistic timed CBTs."
-              />
-
-              <Step
-                number="4"
-                title="Track and improve"
-                description="Use your results and performance data to identify where you need more work."
-              />
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <span>Mathematics</span>
+                  <span>English</span>
+                  <span>Physics</span>
+                  <span>Biology</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-5xl rounded-3xl bg-blue-700 px-6 py-14 text-center text-white shadow-xl sm:px-12">
-          <h3 className="text-3xl font-extrabold sm:text-4xl">
-            Your JAMB preparation starts here.
-          </h3>
+      {/* CBT */}
+      <section className="px-5 py-20 sm:py-28">
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
+          <div>
+            <div className="cbt-preview">
+              <div className="cbt-top">
+                <span>JAMBMASTER CBT</span>
+                <span className="timer-pill">42:18</span>
+              </div>
 
-          <p className="mx-auto mt-4 max-w-2xl text-blue-100">
-            Build your confidence, practise consistently and work toward the
-            score you want.
-          </p>
+              <div className="cbt-body">
+                <div className="cbt-question">
+                  <span>QUESTION 18 OF 60</span>
+                  <h3>
+                    Which of the following best describes the relationship
+                    between...
+                  </h3>
 
-          <a
-            href="/signup"
-            className="mt-8 inline-block rounded-xl bg-white px-7 py-4 font-bold text-blue-700 transition hover:bg-blue-50"
-          >
-            Create Your Account
-          </a>
+                  <div className="answers">
+                    <div>A. Option one</div>
+                    <div>B. Option two</div>
+                    <div className="answer-selected">C. Option three</div>
+                    <div>D. Option four</div>
+                  </div>
+                </div>
+
+                <div className="question-map">
+                  <span className="active">18</span>
+                  <span>19</span>
+                  <span>20</span>
+                  <span>21</span>
+                  <span>22</span>
+                  <span>23</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p className="section-eyebrow">02 / Practise</p>
+
+            <h2 className="section-title">
+              Train for the pressure before the real exam.
+            </h2>
+
+            <p className="section-copy">
+              Knowing the answer is important. Knowing how to answer under
+              time pressure is equally important. JAMBMASTER gives students
+              realistic CBT experiences so they can build speed, confidence
+              and exam discipline.
+            </p>
+
+            <div className="info-grid">
+              <InfoItem title="Timed CBTs" />
+              <InfoItem title="Topic practice" />
+              <InfoItem title="Mock examinations" />
+              <InfoItem title="Instant results" />
+              <InfoItem title="Question review" />
+              <InfoItem title="Performance history" />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 px-6 py-8">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 text-sm text-gray-500 sm:flex-row">
-          <p>© 2026 JAMBMASTER. All rights reserved.</p>
+      {/* BATTLE */}
+      <section id="battles" className="battle-section px-5 py-20 text-white sm:py-28">
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+          <div>
+            <p className="section-eyebrow section-eyebrow-gold">
+              03 / Battle
+            </p>
 
-          <p>Prepare. Practice. Compete. Improve.</p>
+            <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
+              Turn preparation into a battle.
+            </h2>
+
+            <p className="mt-6 max-w-xl text-base leading-8 text-white/65 sm:text-lg">
+              JAMBMASTER gives students a competitive environment where they
+              can challenge friends and other students, test their knowledge
+              and experience the excitement of competition.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <span className="battle-tag">1 vs 1</span>
+              <span className="battle-tag">5 Players</span>
+              <span className="battle-tag">10 Players</span>
+              <span className="battle-tag">20 Players</span>
+              <span className="battle-tag">Leaderboards</span>
+            </div>
+          </div>
+
+          <div className="battle-board">
+            <div className="battle-board-header">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-white/45">
+                  Live battle
+                </p>
+                <h3 className="mt-1 text-xl font-black">JAMB Champions</h3>
+              </div>
+
+              <div className="live-pill">
+                <span />
+                LIVE
+              </div>
+            </div>
+
+            <BattleRow position="01" name="You" score="284" active />
+            <BattleRow position="02" name="Player 02" score="276" />
+            <BattleRow position="03" name="Player 03" score="263" />
+            <BattleRow position="04" name="Player 04" score="251" />
+
+            <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-xs font-semibold text-white/50">
+              Compete. Learn. Improve.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AI */}
+      <section className="px-5 py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl">
+          <div className="ai-card">
+            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+              <div>
+                <p className="section-eyebrow">04 / AI JAMB Coach</p>
+
+                <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight text-[#241331] sm:text-5xl">
+                  Your preparation gets smarter with AI.
+                </h2>
+
+                <p className="mt-6 max-w-xl text-base leading-8 text-[#6d6275]">
+                  The AI JAMB Coach is designed to become an intelligent
+                  learning companion that understands your preparation and
+                  helps you move forward.
+                </p>
+
+                <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                  <AiPoint text="Explain difficult questions" />
+                  <AiPoint text="Recommend practice" />
+                  <AiPoint text="Create study plans" />
+                  <AiPoint text="Identify learning gaps" />
+                </div>
+              </div>
+
+              <div className="ai-chat">
+                <div className="ai-chat-header">
+                  <div className="ai-avatar">AI</div>
+                  <div>
+                    <p className="font-black text-[#291638]">JAMB Coach</p>
+                    <p className="text-xs text-[#8b7f91]">
+                      Your preparation assistant
+                    </p>
+                  </div>
+                </div>
+
+                <div className="chat-message student-message">
+                  I keep struggling with this topic. What should I do?
+                </div>
+
+                <div className="chat-message ai-message">
+                  Let&apos;s break it down. I can explain the concept first,
+                  then give you practice questions focused on this area.
+                </div>
+
+                <div className="chat-input">
+                  <span>Ask your JAMB Coach...</span>
+                  <b>→</b>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ANALYTICS */}
+      <section className="analytics-section px-5 py-20 sm:py-28">
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
+          <div>
+            <p className="section-eyebrow">05 / Analyze</p>
+
+            <h2 className="section-title">
+              Don&apos;t just take tests.
+              <br />
+              Understand your performance.
+            </h2>
+
+            <p className="section-copy">
+              Every practice session should teach you something about your
+              preparation. JAMBMASTER turns your activity into useful
+              performance information.
+            </p>
+
+            <div className="mt-8 space-y-3">
+              <ProgressPoint
+                title="Subject mastery"
+                text="See how you are performing across your subjects."
+              />
+              <ProgressPoint
+                title="Weak topics"
+                text="Identify areas that require more attention."
+              />
+              <ProgressPoint
+                title="Score trends"
+                text="Track how your performance changes over time."
+              />
+              <ProgressPoint
+                title="Smart recommendations"
+                text="Know what to focus on next."
+              />
+            </div>
+          </div>
+
+          <div className="analytics-card">
+            <div className="analytics-header">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#8b7e95]">
+                  Performance
+                </p>
+                <h3 className="mt-1 text-2xl font-black text-[#251431]">
+                  Your progress
+                </h3>
+              </div>
+
+              <div className="score-number">
+                <strong>72%</strong>
+                <span>overall</span>
+              </div>
+            </div>
+
+            <div className="chart">
+              <div className="chart-line">
+                <span className="chart-point point-one" />
+                <span className="chart-point point-two" />
+                <span className="chart-point point-three" />
+                <span className="chart-point point-four" />
+                <span className="chart-point point-five" />
+              </div>
+            </div>
+
+            <div className="analytics-subjects">
+              <SubjectBar name="English" value="82%" width="82%" />
+              <SubjectBar name="Mathematics" value="74%" width="74%" />
+              <SubjectBar name="Physics" value="68%" width="68%" />
+              <SubjectBar name="Biology" value="63%" width="63%" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* COMMUNITY + TUTORS */}
+      <section className="px-5 py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className="community-card">
+              <div className="card-icon purple-icon">◎</div>
+              <p className="mt-7 text-xs font-bold uppercase tracking-[0.15em] text-[#7c3aed]">
+                Student community
+              </p>
+
+              <h3 className="mt-3 text-3xl font-black tracking-tight text-[#251431]">
+                Prepare together.
+              </h3>
+
+              <p className="mt-4 leading-7 text-[#71667b]">
+                Share achievements, encourage other students, create
+                challenges, connect with friends and participate in study
+                groups built around common goals.
+              </p>
+
+              <div className="community-post mt-8">
+                <div className="community-avatar">A</div>
+                <div>
+                  <p className="text-sm font-black text-[#33213e]">
+                    Anonymous Student
+                  </p>
+                  <p className="mt-1 text-sm text-[#71667b]">
+                    Just crossed my first 250+ practice score. Let&apos;s go!
+                  </p>
+                  <div className="mt-3 flex gap-4 text-xs font-bold text-[#8b7f92]">
+                    <span>♡ Encourage</span>
+                    <span>⚔ Challenge</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="tutor-card">
+              <div className="card-icon gold-icon">✦</div>
+              <p className="mt-7 text-xs font-bold uppercase tracking-[0.15em] text-[#a16207]">
+                Tutors & live learning
+              </p>
+
+              <h3 className="mt-3 text-3xl font-black tracking-tight text-[#251431]">
+                Learn with people who can guide you.
+              </h3>
+
+              <p className="mt-4 leading-7 text-[#71667b]">
+                Students can discover tutors, explore tutor profiles, compare
+                learning options, book sessions and participate in private or
+                group live classes.
+              </p>
+
+              <div className="mt-8 grid grid-cols-2 gap-3">
+                <TutorFeature text="Tutor profiles" />
+                <TutorFeature text="Ratings" />
+                <TutorFeature text="Private lessons" />
+                <TutorFeature text="Live classes" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* JOURNEY */}
+      <section id="journey" className="journey-section px-5 py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="section-eyebrow">Your JAMB journey</p>
+
+            <h2 className="section-title">
+              One preparation journey.
+              <br />
+              Built around you.
+            </h2>
+
+            <p className="section-copy mx-auto">
+              JAMBMASTER connects each stage of preparation so that students
+              can move forward instead of preparing without knowing what to do
+              next.
+            </p>
+          </div>
+
+          <div className="journey-grid mt-14">
+            {journey.map((item) => (
+              <div key={item.number} className="journey-item">
+                <div className="journey-number">{item.number}</div>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* MISSION */}
+      <section id="mission" className="mission-section px-5 py-20 sm:py-28">
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="section-eyebrow section-eyebrow-gold">
+            Our mission
+          </p>
+
+          <h2 className="mt-5 text-4xl font-black leading-tight tracking-tight text-white sm:text-6xl">
+            Where Excellence Resides.
+            <br />
+            Where Destiny Is Shaped.
+            <br />
+            Where Success Matters.
+          </h2>
+
+          <p className="mx-auto mt-7 max-w-3xl text-base leading-8 text-white/65 sm:text-lg">
+            We believe every student deserves a better way to prepare. Our
+            mission is to create an environment where students can learn,
+            practise, compete, understand their progress and build the
+            confidence required to face JAMB.
+          </p>
+
+          <div className="mt-10 inline-flex rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white/80 backdrop-blur">
+            Battle JAMB. Overcome Failure. Achieve Your Score.
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="px-5 py-20 sm:py-28">
+        <div className="final-cta mx-auto max-w-6xl">
+          <div className="relative z-10 max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#facc15]">
+              Your preparation starts here
+            </p>
+
+            <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white sm:text-6xl">
+              Don&apos;t just hope for a better JAMB result.
+              <br />
+              Prepare for it.
+            </h2>
+
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/65 sm:text-lg">
+              Start building your preparation around your subjects, your goals
+              and your progress.
+            </p>
+
+            <a
+              href="/signup"
+              className="mt-8 inline-flex items-center gap-3 rounded-xl bg-white px-6 py-4 font-black text-[#5b21b6] transition hover:-translate-y-1"
+            >
+              Start Preparing Free
+              <span>→</span>
+            </a>
+          </div>
+
+          <div className="cta-shape cta-shape-one" />
+          <div className="cta-shape cta-shape-two" />
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-[#e9e4ee] bg-white px-5 py-10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="text-xl font-black tracking-tight text-[#24113f]">
+              JAMB<span className="text-[#7c3aed]">MASTER</span>
+            </div>
+
+            <p className="mt-2 text-sm text-[#81778e]">
+              Where Excellence Resides. Where Destiny Is Shaped. Where Success
+              Matters.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-5 text-sm font-semibold text-[#706579]">
+            <a href="#about" className="footer-link">
+              About
+            </a>
+            <a href="#features" className="footer-link">
+              Features
+            </a>
+            <a href="#journey" className="footer-link">
+              How It Works
+            </a>
+            <a href="/login" className="footer-link">
+              Login
+            </a>
+            <a href="/signup" className="footer-link">
+              Sign Up
+            </a>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-8 max-w-7xl border-t border-[#eeeaf1] pt-6 text-xs text-[#9b92a3]">
+          © 2026 JAMBMASTER. All rights reserved.
         </div>
       </footer>
     </main>
   );
 }
 
-function Feature({
+function MethodCard({
   number,
   title,
-  description,
+  text,
 }: {
   number: string;
   title: string;
-  description: string;
+  text: string;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-      <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-700">
-        {number}
-      </div>
-
-      <h4 className="text-xl font-bold text-gray-900">{title}</h4>
-
-      <p className="mt-3 text-sm leading-6 text-gray-600">{description}</p>
+    <div className="method-card">
+      <div className="method-number">{number}</div>
+      <h3>{title}</h3>
+      <p>{text}</p>
     </div>
   );
 }
 
-function Step({
+function FeatureCard({
   number,
   title,
   description,
+  icon,
 }: {
   number: string;
   title: string;
   description: string;
+  icon: string;
 }) {
   return (
-    <div className="flex gap-4 rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-700 font-bold text-white">
-        {number}
+    <div className="feature-card">
+      <div className="flex items-start justify-between gap-4">
+        <div className={`feature-icon icon-${icon}`}>
+          {icon === "book" && "▣"}
+          {icon === "monitor" && "▤"}
+          {icon === "swords" && "⚔"}
+          {icon === "spark" && "✦"}
+          {icon === "chart" && "↗"}
+          {icon === "users" && "◎"}
+        </div>
+
+        <span className="feature-number">{number}</span>
       </div>
 
+      <h3>{title}</h3>
+      <p>{description}</p>
+
+      <div className="feature-line" />
+    </div>
+  );
+}
+
+function InfoItem({ title }: { title: string }) {
+  return (
+    <div className="info-item">
+      <span>✓</span>
+      {title}
+    </div>
+  );
+}
+
+function BattleRow({
+  position,
+  name,
+  score,
+  active = false,
+}: {
+  position: string;
+  name: string;
+  score: string;
+  active?: boolean;
+}) {
+  return (
+    <div className={`battle-row ${active ? "battle-row-active" : ""}`}>
+      <span className="battle-position">{position}</span>
+      <div className="battle-player">
+        <div className="player-avatar">{name.charAt(0)}</div>
+        <span>{name}</span>
+      </div>
+      <strong>{score}</strong>
+    </div>
+  );
+}
+
+function AiPoint({ text }: { text: string }) {
+  return (
+    <div className="ai-point">
+      <span>✓</span>
+      {text}
+    </div>
+  );
+}
+
+function ProgressPoint({
+  title,
+  text,
+}: {
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="progress-point">
+      <span>✓</span>
       <div>
-        <h4 className="font-bold text-gray-900">{title}</h4>
-
-        <p className="mt-1 text-sm leading-6 text-gray-600">
-          {description}
-        </p>
+        <strong>{title}</strong>
+        <p>{text}</p>
       </div>
+    </div>
+  );
+}
+
+function SubjectBar({
+  name,
+  value,
+  width,
+}: {
+  name: string;
+  value: string;
+  width: string;
+}) {
+  return (
+    <div>
+      <div className="mb-2 flex justify-between text-xs font-bold">
+        <span className="text-[#5f5469]">{name}</span>
+        <span className="text-[#7c3aed]">{value}</span>
+      </div>
+
+      <div className="subject-track">
+        <div
+          className="subject-fill"
+          style={{ width }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function TutorFeature({ text }: { text: string }) {
+  return (
+    <div className="rounded-xl border border-[#eadfc9] bg-[#fffaf0] px-4 py-3 text-sm font-bold text-[#715a2d]">
+      ✓ {text}
     </div>
   );
 }
