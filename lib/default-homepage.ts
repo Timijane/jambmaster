@@ -17,7 +17,7 @@ export const defaultHomepage: HomepageSettings = {
     description:
       "JAMBMASTER is a complete preparation platform designed to help every student prepare smarter, practise harder and approach JAMB with confidence — regardless of their current academic level.",
     primaryButtonText: "Start Preparing Free",
-    primaryButtonLink: "/register",
+    primaryButtonLink: "/signup",
     secondaryButtonText: "Read Blog",
     secondaryButtonLink: "/blog",
     images: [
@@ -30,7 +30,8 @@ export const defaultHomepage: HomepageSettings = {
 
   about: {
     eyebrow: "WHY JAMBMASTER",
-    title: "JAMB preparation should not feel like a battle you have to fight alone.",
+    title:
+      "JAMB preparation should not feel like a battle you have to fight alone.",
     description:
       "JAMBMASTER brings learning, practice, competition, analytics, AI guidance and educational support together in one focused platform.",
     image:
@@ -119,7 +120,7 @@ export const defaultHomepage: HomepageSettings = {
     description:
       "Prepare with purpose. Practice with confidence. Compete with determination.",
     buttonText: "Start Preparing Free",
-    buttonLink: "/register",
+    buttonLink: "/signup",
   },
 
   footer: {
