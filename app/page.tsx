@@ -1,3 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { defaultHomepage } from "@/lib/default-homepage";
+import { HomepageSettings } from "@/lib/cms";
+
 const features = [
   {
     number: "01",
@@ -77,13 +85,213 @@ const journey = [
 ];
 
 export default function Home() {
+  const [homepage, setHomepage] =
+    useState<HomepageSettings>(defaultHomepage);
+
+  const [loading, setLoading] = useState(true);
+  const [heroImageIndex, setHeroImageIndex] = useState(0);
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
+
+  /*
+   * Load homepage configuration from Firestore.
+   *
+   * If the CMS document does not exist, the original
+   * default homepage is used.
+   */
+  useEffect(() => {
+    async function loadHomepage() {
+      try {
+        const homepageRef = doc(db, "siteSettings", "homepage");
+        const snapshot = await getDoc(homepageRef);
+
+        if (snapshot.exists()) {
+          const savedData = snapshot.data() as Partial<HomepageSettings>;
+
+          setHomepage({
+            ...defaultHomepage,
+            ...savedData,
+            hero: {
+              ...defaultHomepage.hero,
+              ...(savedData.hero || {}),
+            },
+            announcement: {
+              ...defaultHomepage.announcement,
+              ...(savedData.announcement || {}),
+            },
+            about: {
+              ...defaultHomepage.about,
+              ...(savedData.about || {}),
+            },
+            method: {
+              ...defaultHomepage.method,
+              ...(savedData.method || {}),
+            },
+            features: {
+              ...defaultHomepage.features,
+              ...(savedData.features || {}),
+            },
+            learning: {
+              ...defaultHomepage.learning,
+              ...(savedData.learning || {}),
+            },
+            cbt: {
+              ...defaultHomepage.cbt,
+              ...(savedData.cbt || {}),
+            },
+            battle: {
+              ...defaultHomepage.battle,
+              ...(savedData.battle || {}),
+            },
+            aiCoach: {
+              ...defaultHomepage.aiCoach,
+              ...(savedData.aiCoach || {}),
+            },
+            analytics: {
+              ...defaultHomepage.analytics,
+              ...(savedData.analytics || {}),
+            },
+            community: {
+              ...defaultHomepage.community,
+              ...(savedData.community || {}),
+            },
+            mission: {
+              ...defaultHomepage.mission,
+              ...(savedData.mission || {}),
+            },
+            finalCta: {
+              ...defaultHomepage.finalCta,
+              ...(savedData.finalCta || {}),
+            },
+            footer: {
+              ...defaultHomepage.footer,
+              ...(savedData.footer || {}),
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load JAMBMASTER homepage:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadHomepage();
+  }, []);
+
+  /*
+   * Hero image rotation.
+   */
+  useEffect(() => {
+    if (homepage.hero.images.length <= 1) {
+      return;
+    }
+
+    const seconds = Math.max(
+      2,
+      homepage.hero.imageRotationSeconds || 6
+    );
+
+    const interval = window.setInterval(() => {
+      setHeroImageIndex((current) =>
+        current + 1 >= homepage.hero.images.length
+          ? 0
+          : current + 1
+      );
+    }, seconds * 1000);
+
+    return () => window.clearInterval(interval);
+  }, [
+    homepage.hero.images,
+    homepage.hero.imageRotationSeconds,
+  ]);
+
+  /*
+   * Moving announcement rotation.
+   */
+  useEffect(() => {
+    if (
+      !homepage.announcement.enabled ||
+      homepage.announcement.items.length <= 1
+    ) {
+      return;
+    }
+
+    const seconds = Math.max(
+      2,
+      homepage.announcement.rotationSeconds || 5
+    );
+
+    const interval = window.setInterval(() => {
+      setAnnouncementIndex((current) =>
+        current + 1 >= homepage.announcement.items.length
+          ? 0
+          : current + 1
+      );
+    }, seconds * 1000);
+
+    return () => window.clearInterval(interval);
+  }, [
+    homepage.announcement.enabled,
+    homepage.announcement.items,
+    homepage.announcement.rotationSeconds,
+  ]);
+
+  const heroImages =
+    homepage.hero.images.length > 0
+      ? homepage.hero.images
+      : defaultHomepage.hero.images;
+
+  const currentHeroImage =
+    heroImages[heroImageIndex % heroImages.length];
+
+  const announcement =
+    homepage.announcement.items.length > 0
+      ? homepage.announcement.items[
+          announcementIndex %
+            homepage.announcement.items.length
+        ]
+      : "";
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#faf9ff]">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-purple-100 border-t-[#6d28d9]" />
+
+          <p className="text-sm font-bold text-[#6d28d9]">
+            Loading JAMBMASTER...
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="overflow-hidden bg-[#faf9ff] text-[#171321]">
+      {/* MOVING ANNOUNCEMENT */}
+      {homepage.announcement.enabled && announcement && (
+        <div className="relative z-[60] overflow-hidden bg-[#24113f] text-white">
+          <div className="announcement-track">
+            <div className="mx-auto flex min-h-[38px] max-w-7xl items-center justify-center px-5 text-center">
+              <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
+                <span className="status-dot" />
+
+                <span
+                  key={`${announcementIndex}-${announcement}`}
+                  className="announcement-message"
+                >
+                  {announcement}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* NAVIGATION */}
       <header className="site-header">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
           <a href="/" className="flex items-center gap-3">
-            {/* Cloudinary logo will replace this placeholder */}
             <div className="logo-placeholder">
               LOGO
             </div>
@@ -92,6 +300,7 @@ export default function Home() {
               <div className="text-xl font-black tracking-tight text-[#24113f]">
                 JAMB<span className="text-[#7c3aed]">MASTER</span>
               </div>
+
               <div className="hidden text-[9px] font-semibold uppercase tracking-[0.2em] text-[#81778e] sm:block">
                 Prepare. Battle. Succeed.
               </div>
@@ -102,12 +311,15 @@ export default function Home() {
             <a href="#about" className="nav-link">
               About
             </a>
+
             <a href="#features" className="nav-link">
               Features
             </a>
+
             <a href="#journey" className="nav-link">
               How It Works
             </a>
+
             <a href="#mission" className="nav-link">
               Our Mission
             </a>
@@ -140,37 +352,31 @@ export default function Home() {
           <div className="relative z-10 fade-up">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-purple-200 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#6d28d9] shadow-sm backdrop-blur">
               <span className="status-dot" />
-              Built for JAMB students
+              {homepage.hero.eyebrow}
             </div>
 
             <h1 className="max-w-4xl text-5xl font-black leading-[0.98] tracking-[-0.045em] text-[#21132f] sm:text-6xl lg:text-[76px]">
-              Battle JAMB.
-              <br />
-              <span className="gradient-text">Overcome Failure.</span>
-              <br />
-              Achieve Your Score.
+              {formatHeroTitle(homepage.hero.title)}
             </h1>
 
             <p className="mt-7 max-w-2xl text-base leading-7 text-[#675d72] sm:text-lg sm:leading-8">
-              JAMBMASTER is a complete preparation platform built to help
-              students learn smarter, practise consistently, compete with
-              confidence and understand exactly where they need to improve.
+              {homepage.hero.description}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
-                href="/signup"
+                href={homepage.hero.primaryButtonLink}
                 className="primary-button group"
               >
-                Start Preparing Free
+                {homepage.hero.primaryButtonText}
                 <span className="button-arrow">→</span>
               </a>
 
               <a
-                href="#about"
+                href={homepage.hero.secondaryButtonLink}
                 className="secondary-button"
               >
-                Explore JAMBMASTER
+                {homepage.hero.secondaryButtonText}
               </a>
             </div>
 
@@ -179,14 +385,17 @@ export default function Home() {
                 <span className="check-circle">✓</span>
                 Learn
               </div>
+
               <div className="flex items-center gap-2">
                 <span className="check-circle">✓</span>
                 Practise
               </div>
+
               <div className="flex items-center gap-2">
                 <span className="check-circle">✓</span>
                 Battle
               </div>
+
               <div className="flex items-center gap-2">
                 <span className="check-circle">✓</span>
                 Improve
@@ -197,11 +406,11 @@ export default function Home() {
           {/* HERO VISUAL */}
           <div className="relative mx-auto w-full max-w-[570px] lg:ml-auto fade-up delay-one">
             <div className="hero-image-wrap">
-              {/* Temporary image. This will later come from the JAMBMASTER Cloudinary Media Manager. */}
               <img
-                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=85"
-                alt="Students studying together"
-                className="hero-image"
+                key={currentHeroImage}
+                src={currentHeroImage}
+                alt="Students preparing for JAMB"
+                className="hero-image hero-image-fade"
               />
 
               <div className="hero-image-overlay" />
@@ -210,10 +419,29 @@ export default function Home() {
                 <div className="text-xs font-bold uppercase tracking-[0.16em] text-white/70">
                   Your preparation
                 </div>
+
                 <div className="mt-1 text-xl font-black text-white">
                   Starts with a system.
                 </div>
               </div>
+
+              {heroImages.length > 1 && (
+                <div className="absolute bottom-5 right-5 z-20 flex gap-1.5">
+                  {heroImages.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      aria-label={`Show hero image ${index + 1}`}
+                      onClick={() => setHeroImageIndex(index)}
+                      className={`h-1.5 rounded-full transition-all ${
+                        index === heroImageIndex
+                          ? "w-7 bg-white"
+                          : "w-2 bg-white/45"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="floating-card floating-score">
@@ -222,6 +450,7 @@ export default function Home() {
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#83768f]">
                     Target Score
                   </p>
+
                   <p className="mt-1 text-2xl font-black text-[#261532]">
                     300+
                   </p>
@@ -236,10 +465,12 @@ export default function Home() {
             <div className="floating-card floating-battle">
               <div className="flex items-center gap-3">
                 <div className="battle-icon">⚔</div>
+
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#83768f]">
                     JAMB Battle
                   </p>
+
                   <p className="mt-0.5 text-sm font-black text-[#261532]">
                     Ready to compete?
                   </p>
@@ -307,7 +538,7 @@ export default function Home() {
             <div className="relative">
               <div className="about-image-frame">
                 <img
-                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=85"
+                  src={homepage.about.image}
                   alt="Students learning together"
                   className="about-image"
                 />
@@ -315,10 +546,12 @@ export default function Home() {
 
               <div className="about-note">
                 <span className="about-note-icon">★</span>
+
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-[#81758d]">
                     The goal
                   </p>
+
                   <p className="mt-1 font-black text-[#291638]">
                     Make preparation easier.
                   </p>
@@ -327,18 +560,16 @@ export default function Home() {
             </div>
 
             <div>
-              <p className="section-eyebrow">What is JAMBMASTER?</p>
+              <p className="section-eyebrow">
+                {homepage.about.eyebrow}
+              </p>
 
               <h2 className="section-title">
-                A preparation ecosystem built around the student.
+                {homepage.about.title}
               </h2>
 
               <p className="section-copy">
-                JAMBMASTER is designed to become a student&apos;s complete
-                preparation environment for JAMB. Instead of jumping between
-                different resources, practice platforms, communities and
-                tutors, students can have their preparation organized in one
-                place.
+                {homepage.about.description}
               </p>
 
               <p className="section-copy">
@@ -390,15 +621,16 @@ export default function Home() {
       <section className="method-section px-5 py-20 sm:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="section-eyebrow">The JAMBMASTER method</p>
+            <p className="section-eyebrow">
+              {homepage.method.eyebrow}
+            </p>
 
             <h2 className="section-title">
-              Learn. Practise. Compete. Analyze. Improve.
+              {homepage.method.title}
             </h2>
 
             <p className="section-copy mx-auto">
-              Preparation becomes more powerful when every activity connects
-              to the next one.
+              {homepage.method.description}
             </p>
           </div>
 
@@ -434,18 +666,16 @@ export default function Home() {
       <section id="features" className="px-5 py-20 sm:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
-            <p className="section-eyebrow">Everything in one place</p>
+            <p className="section-eyebrow">
+              {homepage.features.eyebrow}
+            </p>
 
             <h2 className="section-title">
-              More than CBT practice.
-              <br />
-              A complete JAMB experience.
+              {homepage.features.title}
             </h2>
 
             <p className="section-copy">
-              JAMBMASTER combines learning, testing, competition, artificial
-              intelligence, analytics, community and tutoring into one
-              student-centered platform.
+              {homepage.features.description}
             </p>
           </div>
 
@@ -467,18 +697,16 @@ export default function Home() {
       <section className="feature-showcase px-5 py-20 sm:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
           <div className="order-2 lg:order-1">
-            <p className="section-eyebrow">01 / Learn</p>
+            <p className="section-eyebrow">
+              {homepage.learning.eyebrow}
+            </p>
 
             <h2 className="section-title">
-              Your four subjects.
-              <br />
-              Your preparation.
+              {homepage.learning.title}
             </h2>
 
             <p className="section-copy">
-              JAMBMASTER starts by understanding what you are preparing for.
-              Students select their four JAMB subjects and build their
-              preparation around them.
+              {homepage.learning.description}
             </p>
 
             <ul className="feature-list">
@@ -493,7 +721,7 @@ export default function Home() {
           <div className="order-1 lg:order-2">
             <div className="feature-image-card">
               <img
-                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85"
+                src={homepage.learning.image}
                 alt="Student studying on a laptop"
                 className="feature-image"
               />
@@ -528,6 +756,7 @@ export default function Home() {
               <div className="cbt-body">
                 <div className="cbt-question">
                   <span>QUESTION 18 OF 60</span>
+
                   <h3>
                     Which of the following best describes the relationship
                     between...
@@ -536,7 +765,9 @@ export default function Home() {
                   <div className="answers">
                     <div>A. Option one</div>
                     <div>B. Option two</div>
-                    <div className="answer-selected">C. Option three</div>
+                    <div className="answer-selected">
+                      C. Option three
+                    </div>
                     <div>D. Option four</div>
                   </div>
                 </div>
@@ -554,17 +785,16 @@ export default function Home() {
           </div>
 
           <div>
-            <p className="section-eyebrow">02 / Practise</p>
+            <p className="section-eyebrow">
+              {homepage.cbt.eyebrow}
+            </p>
 
             <h2 className="section-title">
-              Train for the pressure before the real exam.
+              {homepage.cbt.title}
             </h2>
 
             <p className="section-copy">
-              Knowing the answer is important. Knowing how to answer under
-              time pressure is equally important. JAMBMASTER gives students
-              realistic CBT experiences so they can build speed, confidence
-              and exam discipline.
+              {homepage.cbt.description}
             </p>
 
             <div className="info-grid">
@@ -580,21 +810,22 @@ export default function Home() {
       </section>
 
       {/* BATTLE */}
-      <section id="battles" className="battle-section px-5 py-20 text-white sm:py-28">
+      <section
+        id="battles"
+        className="battle-section px-5 py-20 text-white sm:py-28"
+      >
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
           <div>
             <p className="section-eyebrow section-eyebrow-gold">
-              03 / Battle
+              {homepage.battle.eyebrow}
             </p>
 
             <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
-              Turn preparation into a battle.
+              {homepage.battle.title}
             </h2>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-white/65 sm:text-lg">
-              JAMBMASTER gives students a competitive environment where they
-              can challenge friends and other students, test their knowledge
-              and experience the excitement of competition.
+              {homepage.battle.description}
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -612,7 +843,10 @@ export default function Home() {
                 <p className="text-xs font-bold uppercase tracking-widest text-white/45">
                   Live battle
                 </p>
-                <h3 className="mt-1 text-xl font-black">JAMB Champions</h3>
+
+                <h3 className="mt-1 text-xl font-black">
+                  JAMB Champions
+                </h3>
               </div>
 
               <div className="live-pill">
@@ -621,10 +855,30 @@ export default function Home() {
               </div>
             </div>
 
-            <BattleRow position="01" name="You" score="284" active />
-            <BattleRow position="02" name="Player 02" score="276" />
-            <BattleRow position="03" name="Player 03" score="263" />
-            <BattleRow position="04" name="Player 04" score="251" />
+            <BattleRow
+              position="01"
+              name="You"
+              score="284"
+              active
+            />
+
+            <BattleRow
+              position="02"
+              name="Player 02"
+              score="276"
+            />
+
+            <BattleRow
+              position="03"
+              name="Player 03"
+              score="263"
+            />
+
+            <BattleRow
+              position="04"
+              name="Player 04"
+              score="251"
+            />
 
             <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-xs font-semibold text-white/50">
               Compete. Learn. Improve.
@@ -639,16 +893,16 @@ export default function Home() {
           <div className="ai-card">
             <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
               <div>
-                <p className="section-eyebrow">04 / AI JAMB Coach</p>
+                <p className="section-eyebrow">
+                  {homepage.aiCoach.eyebrow}
+                </p>
 
                 <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight text-[#241331] sm:text-5xl">
-                  Your preparation gets smarter with AI.
+                  {homepage.aiCoach.title}
                 </h2>
 
                 <p className="mt-6 max-w-xl text-base leading-8 text-[#6d6275]">
-                  The AI JAMB Coach is designed to become an intelligent
-                  learning companion that understands your preparation and
-                  helps you move forward.
+                  {homepage.aiCoach.description}
                 </p>
 
                 <div className="mt-7 grid gap-3 sm:grid-cols-2">
@@ -662,8 +916,12 @@ export default function Home() {
               <div className="ai-chat">
                 <div className="ai-chat-header">
                   <div className="ai-avatar">AI</div>
+
                   <div>
-                    <p className="font-black text-[#291638]">JAMB Coach</p>
+                    <p className="font-black text-[#291638]">
+                      JAMB Coach
+                    </p>
+
                     <p className="text-xs text-[#8b7f91]">
                       Your preparation assistant
                     </p>
@@ -693,18 +951,16 @@ export default function Home() {
       <section className="analytics-section px-5 py-20 sm:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="section-eyebrow">05 / Analyze</p>
+            <p className="section-eyebrow">
+              {homepage.analytics.eyebrow}
+            </p>
 
             <h2 className="section-title">
-              Don&apos;t just take tests.
-              <br />
-              Understand your performance.
+              {homepage.analytics.title}
             </h2>
 
             <p className="section-copy">
-              Every practice session should teach you something about your
-              preparation. JAMBMASTER turns your activity into useful
-              performance information.
+              {homepage.analytics.description}
             </p>
 
             <div className="mt-8 space-y-3">
@@ -712,14 +968,17 @@ export default function Home() {
                 title="Subject mastery"
                 text="See how you are performing across your subjects."
               />
+
               <ProgressPoint
                 title="Weak topics"
                 text="Identify areas that require more attention."
               />
+
               <ProgressPoint
                 title="Score trends"
                 text="Track how your performance changes over time."
               />
+
               <ProgressPoint
                 title="Smart recommendations"
                 text="Know what to focus on next."
@@ -733,6 +992,7 @@ export default function Home() {
                 <p className="text-xs font-bold uppercase tracking-widest text-[#8b7e95]">
                   Performance
                 </p>
+
                 <h3 className="mt-1 text-2xl font-black text-[#251431]">
                   Your progress
                 </h3>
@@ -755,10 +1015,29 @@ export default function Home() {
             </div>
 
             <div className="analytics-subjects">
-              <SubjectBar name="English" value="82%" width="82%" />
-              <SubjectBar name="Mathematics" value="74%" width="74%" />
-              <SubjectBar name="Physics" value="68%" width="68%" />
-              <SubjectBar name="Biology" value="63%" width="63%" />
+              <SubjectBar
+                name="English"
+                value="82%"
+                width="82%"
+              />
+
+              <SubjectBar
+                name="Mathematics"
+                value="74%"
+                width="74%"
+              />
+
+              <SubjectBar
+                name="Physics"
+                value="68%"
+                width="68%"
+              />
+
+              <SubjectBar
+                name="Biology"
+                value="63%"
+                width="63%"
+              />
             </div>
           </div>
         </div>
@@ -769,30 +1048,36 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-5 lg:grid-cols-2">
             <div className="community-card">
-              <div className="card-icon purple-icon">◎</div>
+              <div className="card-icon purple-icon">
+                ◎
+              </div>
+
               <p className="mt-7 text-xs font-bold uppercase tracking-[0.15em] text-[#7c3aed]">
-                Student community
+                {homepage.community.eyebrow}
               </p>
 
               <h3 className="mt-3 text-3xl font-black tracking-tight text-[#251431]">
-                Prepare together.
+                {homepage.community.title}
               </h3>
 
               <p className="mt-4 leading-7 text-[#71667b]">
-                Share achievements, encourage other students, create
-                challenges, connect with friends and participate in study
-                groups built around common goals.
+                {homepage.community.description}
               </p>
 
               <div className="community-post mt-8">
-                <div className="community-avatar">A</div>
+                <div className="community-avatar">
+                  A
+                </div>
+
                 <div>
                   <p className="text-sm font-black text-[#33213e]">
                     Anonymous Student
                   </p>
+
                   <p className="mt-1 text-sm text-[#71667b]">
                     Just crossed my first 250+ practice score. Let&apos;s go!
                   </p>
+
                   <div className="mt-3 flex gap-4 text-xs font-bold text-[#8b7f92]">
                     <span>♡ Encourage</span>
                     <span>⚔ Challenge</span>
@@ -802,7 +1087,10 @@ export default function Home() {
             </div>
 
             <div className="tutor-card">
-              <div className="card-icon gold-icon">✦</div>
+              <div className="card-icon gold-icon">
+                ✦
+              </div>
+
               <p className="mt-7 text-xs font-bold uppercase tracking-[0.15em] text-[#a16207]">
                 Tutors & live learning
               </p>
@@ -832,7 +1120,9 @@ export default function Home() {
       <section id="journey" className="journey-section px-5 py-20 sm:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="section-eyebrow">Your JAMB journey</p>
+            <p className="section-eyebrow">
+              Your JAMB journey
+            </p>
 
             <h2 className="section-title">
               One preparation journey.
@@ -850,7 +1140,10 @@ export default function Home() {
           <div className="journey-grid mt-14">
             {journey.map((item) => (
               <div key={item.number} className="journey-item">
-                <div className="journey-number">{item.number}</div>
+                <div className="journey-number">
+                  {item.number}
+                </div>
+
                 <div>
                   <h3>{item.title}</h3>
                   <p>{item.text}</p>
@@ -862,25 +1155,21 @@ export default function Home() {
       </section>
 
       {/* MISSION */}
-      <section id="mission" className="mission-section px-5 py-20 sm:py-28">
+      <section
+        id="mission"
+        className="mission-section px-5 py-20 sm:py-28"
+      >
         <div className="mx-auto max-w-5xl text-center">
           <p className="section-eyebrow section-eyebrow-gold">
-            Our mission
+            {homepage.mission.eyebrow}
           </p>
 
           <h2 className="mt-5 text-4xl font-black leading-tight tracking-tight text-white sm:text-6xl">
-            Where Excellence Resides.
-            <br />
-            Where Destiny Is Shaped.
-            <br />
-            Where Success Matters.
+            {homepage.mission.title}
           </h2>
 
           <p className="mx-auto mt-7 max-w-3xl text-base leading-8 text-white/65 sm:text-lg">
-            We believe every student deserves a better way to prepare. Our
-            mission is to create an environment where students can learn,
-            practise, compete, understand their progress and build the
-            confidence required to face JAMB.
+            {homepage.mission.description}
           </p>
 
           <div className="mt-10 inline-flex rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white/80 backdrop-blur">
@@ -898,21 +1187,18 @@ export default function Home() {
             </p>
 
             <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white sm:text-6xl">
-              Don&apos;t just hope for a better JAMB result.
-              <br />
-              Prepare for it.
+              {homepage.finalCta.title}
             </h2>
 
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/65 sm:text-lg">
-              Start building your preparation around your subjects, your goals
-              and your progress.
+              {homepage.finalCta.description}
             </p>
 
             <a
-              href="/signup"
+              href={homepage.finalCta.buttonLink}
               className="mt-8 inline-flex items-center gap-3 rounded-xl bg-white px-6 py-4 font-black text-[#5b21b6] transition hover:-translate-y-1"
             >
-              Start Preparing Free
+              {homepage.finalCta.buttonText}
               <span>→</span>
             </a>
           </div>
@@ -930,9 +1216,12 @@ export default function Home() {
               JAMB<span className="text-[#7c3aed]">MASTER</span>
             </div>
 
-            <p className="mt-2 text-sm text-[#81778e]">
-              Where Excellence Resides. Where Destiny Is Shaped. Where Success
-              Matters.
+            <p className="mt-2 max-w-xl text-sm text-[#81778e]">
+              {homepage.footer.description}
+            </p>
+
+            <p className="mt-3 text-xs font-bold text-[#7c3aed]">
+              Managed by {homepage.footer.managedBy}
             </p>
           </div>
 
@@ -940,15 +1229,23 @@ export default function Home() {
             <a href="#about" className="footer-link">
               About
             </a>
+
             <a href="#features" className="footer-link">
               Features
             </a>
+
             <a href="#journey" className="footer-link">
               How It Works
             </a>
+
+            <a href="/blog" className="footer-link">
+              Blog
+            </a>
+
             <a href="/login" className="footer-link">
               Login
             </a>
+
             <a href="/signup" className="footer-link">
               Sign Up
             </a>
@@ -956,11 +1253,33 @@ export default function Home() {
         </div>
 
         <div className="mx-auto mt-8 max-w-7xl border-t border-[#eeeaf1] pt-6 text-xs text-[#9b92a3]">
-          © 2026 JAMBMASTER. All rights reserved.
+          {homepage.footer.copyright}
         </div>
       </footer>
     </main>
   );
+}
+
+/*
+ * Allows the CMS title to retain a strong visual hierarchy.
+ * If the title contains line breaks, they are respected.
+ */
+function formatHeroTitle(title: string) {
+  const parts = title.split("\n");
+
+  if (parts.length === 1) {
+    return title;
+  }
+
+  return parts.map((part, index) => (
+    <span key={`${part}-${index}`} className="block">
+      {index === 1 ? (
+        <span className="gradient-text">{part}</span>
+      ) : (
+        part
+      )}
+    </span>
+  ));
 }
 
 function MethodCard({
@@ -974,8 +1293,12 @@ function MethodCard({
 }) {
   return (
     <div className="method-card">
-      <div className="method-number">{number}</div>
+      <div className="method-number">
+        {number}
+      </div>
+
       <h3>{title}</h3>
+
       <p>{text}</p>
     </div>
   );
@@ -1004,10 +1327,13 @@ function FeatureCard({
           {icon === "users" && "◎"}
         </div>
 
-        <span className="feature-number">{number}</span>
+        <span className="feature-number">
+          {number}
+        </span>
       </div>
 
       <h3>{title}</h3>
+
       <p>{description}</p>
 
       <div className="feature-line" />
@@ -1036,12 +1362,23 @@ function BattleRow({
   active?: boolean;
 }) {
   return (
-    <div className={`battle-row ${active ? "battle-row-active" : ""}`}>
-      <span className="battle-position">{position}</span>
+    <div
+      className={`battle-row ${
+        active ? "battle-row-active" : ""
+      }`}
+    >
+      <span className="battle-position">
+        {position}
+      </span>
+
       <div className="battle-player">
-        <div className="player-avatar">{name.charAt(0)}</div>
+        <div className="player-avatar">
+          {name.charAt(0)}
+        </div>
+
         <span>{name}</span>
       </div>
+
       <strong>{score}</strong>
     </div>
   );
@@ -1066,6 +1403,7 @@ function ProgressPoint({
   return (
     <div className="progress-point">
       <span>✓</span>
+
       <div>
         <strong>{title}</strong>
         <p>{text}</p>
@@ -1086,8 +1424,13 @@ function SubjectBar({
   return (
     <div>
       <div className="mb-2 flex justify-between text-xs font-bold">
-        <span className="text-[#5f5469]">{name}</span>
-        <span className="text-[#7c3aed]">{value}</span>
+        <span className="text-[#5f5469]">
+          {name}
+        </span>
+
+        <span className="text-[#7c3aed]">
+          {value}
+        </span>
       </div>
 
       <div className="subject-track">
