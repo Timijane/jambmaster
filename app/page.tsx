@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { defaultHomepage } from "@/lib/default-homepage";
@@ -10,83 +10,94 @@ import {
   SiteSettings,
 } from "@/lib/site-settings";
 
-const features = [
-  {
-    number: "01",
-    title: "Personalized Learning",
-    description:
-      "Build your preparation around the four subjects you actually selected for JAMB. Study topics, resources and materials in a structured learning environment.",
-    icon: "book",
-  },
-  {
-    number: "02",
-    title: "Real CBT Practice",
-    description:
-      "Practise with timed computer-based tests designed to help you become familiar with the pressure, speed and discipline required during JAMB.",
-    icon: "monitor",
-  },
-  {
-    number: "03",
-    title: "JAMB Battle Arena",
-    description:
-      "Challenge other students in competitive JAMB battles. Compete one-on-one or against groups and see how you perform under pressure.",
-    icon: "swords",
-  },
-  {
-    number: "04",
-    title: "AI JAMB Coach",
-    description:
-      "Get intelligent guidance that can explain difficult questions, identify learning gaps, recommend practice and help organize your preparation.",
-    icon: "spark",
-  },
-  {
-    number: "05",
-    title: "Performance Analytics",
-    description:
-      "Understand your preparation with performance trends, subject mastery, strengths, weaknesses and recommendations for improvement.",
-    icon: "chart",
-  },
-  {
-    number: "06",
-    title: "Student Community",
-    description:
-      "Connect with other JAMB candidates, share achievements, encourage friends, create challenges and become part of a preparation community.",
-    icon: "users",
-  },
-];
+function mergeHomepage(
+  savedData: Partial<HomepageSettings>
+): HomepageSettings {
+  return {
+    ...defaultHomepage,
+    ...savedData,
 
-const journey = [
-  {
-    number: "01",
-    title: "Create your student profile",
-    text: "Tell JAMBMASTER about your JAMB year, target university, course, target score and academic goals.",
-  },
-  {
-    number: "02",
-    title: "Choose your four subjects",
-    text: "Your learning environment is organized around the four subjects you will take in JAMB.",
-  },
-  {
-    number: "03",
-    title: "Learn your topics",
-    text: "Study structured topics using educational materials, resources, videos and guided learning.",
-  },
-  {
-    number: "04",
-    title: "Practise continuously",
-    text: "Move from learning to questions and timed CBTs until answering becomes faster and more confident.",
-  },
-  {
-    number: "05",
-    title: "Battle and compete",
-    text: "Challenge other students and use competition as another way to test your knowledge and consistency.",
-  },
-  {
-    number: "06",
-    title: "Analyze and improve",
-    text: "Use your performance data to discover where you are strong, where you need work and what to study next.",
-  },
-];
+    announcement: {
+      ...defaultHomepage.announcement,
+      ...(savedData.announcement || {}),
+    },
+
+    hero: {
+      ...defaultHomepage.hero,
+      ...(savedData.hero || {}),
+    },
+
+    about: {
+      ...defaultHomepage.about,
+      ...(savedData.about || {}),
+    },
+
+    method: {
+      ...defaultHomepage.method,
+      ...(savedData.method || {}),
+    },
+
+    features: {
+      ...defaultHomepage.features,
+      ...(savedData.features || {}),
+    },
+
+    learning: {
+      ...defaultHomepage.learning,
+      ...(savedData.learning || {}),
+    },
+
+    cbt: {
+      ...defaultHomepage.cbt,
+      ...(savedData.cbt || {}),
+    },
+
+    battle: {
+      ...defaultHomepage.battle,
+      ...(savedData.battle || {}),
+    },
+
+    aiCoach: {
+      ...defaultHomepage.aiCoach,
+      ...(savedData.aiCoach || {}),
+    },
+
+    analytics: {
+      ...defaultHomepage.analytics,
+      ...(savedData.analytics || {}),
+    },
+
+    community: {
+      ...defaultHomepage.community,
+      ...(savedData.community || {}),
+    },
+
+    tutors: {
+      ...defaultHomepage.tutors,
+      ...(savedData.tutors || {}),
+    },
+
+    journey: {
+      ...defaultHomepage.journey,
+      ...(savedData.journey || {}),
+    },
+
+    mission: {
+      ...defaultHomepage.mission,
+      ...(savedData.mission || {}),
+    },
+
+    finalCta: {
+      ...defaultHomepage.finalCta,
+      ...(savedData.finalCta || {}),
+    },
+
+    footer: {
+      ...defaultHomepage.footer,
+      ...(savedData.footer || {}),
+    },
+  };
+}
 
 export default function Home() {
   const [homepage, setHomepage] =
@@ -97,122 +108,38 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true);
   const [heroImageIndex, setHeroImageIndex] = useState(0);
-  const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [announcementIndex, setAnnouncementIndex] =
+    useState(0);
 
-  /*
-   * Load homepage CMS configuration and global
-   * website settings from Firestore.
-   *
-   * Empty custom image fields intentionally fall
-   * back to the original default images below.
-   */
   useEffect(() => {
     async function loadWebsiteConfiguration() {
       try {
-        const homepageRef = doc(
-          db,
-          "siteSettings",
-          "homepage"
-        );
-
-        const siteRef = doc(
-          db,
-          "siteSettings",
-          "site"
-        );
-
         const [homepageSnapshot, siteSnapshot] =
           await Promise.all([
-            getDoc(homepageRef),
-            getDoc(siteRef),
+            getDoc(
+              doc(
+                db,
+                "siteSettings",
+                "homepage"
+              )
+            ),
+            getDoc(
+              doc(
+                db,
+                "siteSettings",
+                "site"
+              )
+            ),
           ]);
 
-        /*
-         * HOMEPAGE SETTINGS
-         */
         if (homepageSnapshot.exists()) {
-          const savedData =
-            homepageSnapshot.data() as Partial<HomepageSettings>;
-
-          setHomepage({
-            ...defaultHomepage,
-            ...savedData,
-
-            hero: {
-              ...defaultHomepage.hero,
-              ...(savedData.hero || {}),
-            },
-
-            announcement: {
-              ...defaultHomepage.announcement,
-              ...(savedData.announcement || {}),
-            },
-
-            about: {
-              ...defaultHomepage.about,
-              ...(savedData.about || {}),
-            },
-
-            method: {
-              ...defaultHomepage.method,
-              ...(savedData.method || {}),
-            },
-
-            features: {
-              ...defaultHomepage.features,
-              ...(savedData.features || {}),
-            },
-
-            learning: {
-              ...defaultHomepage.learning,
-              ...(savedData.learning || {}),
-            },
-
-            cbt: {
-              ...defaultHomepage.cbt,
-              ...(savedData.cbt || {}),
-            },
-
-            battle: {
-              ...defaultHomepage.battle,
-              ...(savedData.battle || {}),
-            },
-
-            aiCoach: {
-              ...defaultHomepage.aiCoach,
-              ...(savedData.aiCoach || {}),
-            },
-
-            analytics: {
-              ...defaultHomepage.analytics,
-              ...(savedData.analytics || {}),
-            },
-
-            community: {
-              ...defaultHomepage.community,
-              ...(savedData.community || {}),
-            },
-
-            mission: {
-              ...defaultHomepage.mission,
-              ...(savedData.mission || {}),
-            },
-
-            finalCta: {
-              ...defaultHomepage.finalCta,
-              ...(savedData.finalCta || {}),
-            },
-
-            footer: {
-              ...defaultHomepage.footer,
-              ...(savedData.footer || {}),
-            },
-          });
+          setHomepage(
+            mergeHomepage(
+              homepageSnapshot.data() as Partial<HomepageSettings>
+            )
+          );
         }
 
-        /*
-         * GLOBAL SITE SETTINGS
-         */
         if (siteSnapshot.exists()) {
           setSiteSettings({
             ...defaultSiteSettings,
@@ -232,38 +159,33 @@ export default function Home() {
     loadWebsiteConfiguration();
   }, []);
 
-  /*
-   * Build the effective hero image list.
-   *
-   * Each custom slot works independently.
-   *
-   * Example:
-   *
-   * custom Hero 1
-   * empty Hero 2
-   * custom Hero 3
-   *
-   * becomes:
-   *
-   * custom Hero 1
-   * default Hero 2
-   * custom Hero 3
-   */
-  const heroImages = [
-    homepage.hero.images?.[0] ||
-      defaultHomepage.hero.images[0],
+  const heroImages = useMemo(
+    () =>
+      [
+        homepage.hero.images?.[0] ||
+          defaultHomepage.hero.images[0],
 
-    homepage.hero.images?.[1] ||
-      defaultHomepage.hero.images[1],
+        homepage.hero.images?.[1] ||
+          defaultHomepage.hero.images[1],
 
-    homepage.hero.images?.[2] ||
-      defaultHomepage.hero.images[2],
-  ].filter(Boolean);
+        homepage.hero.images?.[2] ||
+          defaultHomepage.hero.images[2],
+      ].filter(Boolean),
+    [
+      homepage.hero.images,
+    ]
+  );
 
-  /*
-   * Keep the selected hero index valid whenever
-   * the effective image list changes.
-   */
+  const announcementItems = useMemo(
+    () =>
+      homepage.announcement.items?.filter(
+        (item) => item.trim().length > 0
+      ) || [],
+    [
+      homepage.announcement.items,
+    ]
+  );
+
   useEffect(() => {
     setHeroImageIndex((current) => {
       if (heroImages.length === 0) {
@@ -272,16 +194,8 @@ export default function Home() {
 
       return current % heroImages.length;
     });
-  }, [
-    heroImages.length,
-    homepage.hero.images?.[0],
-    homepage.hero.images?.[1],
-    homepage.hero.images?.[2],
-  ]);
+  }, [heroImages.length]);
 
-  /*
-   * Hero image rotation.
-   */
   useEffect(() => {
     if (heroImages.length <= 1) {
       return;
@@ -300,21 +214,12 @@ export default function Home() {
       );
     }, seconds * 1000);
 
-    return () => window.clearInterval(interval);
+    return () =>
+      window.clearInterval(interval);
   }, [
     heroImages.length,
     homepage.hero.imageRotationSeconds,
   ]);
-
-  /*
-   * Moving announcement rotation.
-   *
-   * Empty CMS announcement items are ignored.
-   */
-  const announcementItems =
-    homepage.announcement.items?.filter(
-      (item) => item.trim().length > 0
-    ) || [];
 
   useEffect(() => {
     if (
@@ -337,17 +242,14 @@ export default function Home() {
       );
     }, seconds * 1000);
 
-    return () => window.clearInterval(interval);
+    return () =>
+      window.clearInterval(interval);
   }, [
     homepage.announcement.enabled,
     homepage.announcement.rotationSeconds,
     announcementItems.length,
   ]);
 
-  /*
-   * Make sure the announcement index remains
-   * valid if the CMS content changes.
-   */
   useEffect(() => {
     setAnnouncementIndex((current) => {
       if (announcementItems.length === 0) {
@@ -356,10 +258,7 @@ export default function Home() {
 
       return current % announcementItems.length;
     });
-  }, [
-    announcementItems.length,
-    homepage.announcement.items,
-  ]);
+  }, [announcementItems.length]);
 
   const currentHeroImage =
     heroImages.length > 0
@@ -371,17 +270,11 @@ export default function Home() {
   const announcement =
     announcementItems.length > 0
       ? announcementItems[
-          announcementIndex % announcementItems.length
+          announcementIndex %
+            announcementItems.length
         ]
       : "";
 
-  /*
-   * IMAGE FALLBACK HELPERS
-   *
-   * If a custom image is deleted, the CMS leaves
-   * the field empty. These helpers immediately
-   * restore the original default image.
-   */
   const aboutImage =
     homepage.about.image ||
     defaultHomepage.about.image;
@@ -414,12 +307,6 @@ export default function Home() {
     homepage.mission.image ||
     defaultHomepage.mission.image;
 
-  /*
-   * Global logo.
-   *
-   * If no custom logo exists, the normal
-   * JAMBMASTER text branding is displayed.
-   */
   const customLogo =
     siteSettings.logo?.trim() || "";
 
@@ -439,7 +326,7 @@ export default function Home() {
 
   return (
     <main className="overflow-hidden bg-[#faf9ff] text-[#171321]">
-      {/* MOVING ANNOUNCEMENT */}
+      {/* ANNOUNCEMENT */}
       {homepage.announcement.enabled &&
         announcement && (
           <div className="relative z-[60] overflow-hidden bg-[#24113f] text-white">
@@ -498,24 +385,15 @@ export default function Home() {
               About
             </a>
 
-            <a
-              href="#features"
-              className="nav-link"
-            >
+            <a href="#features" className="nav-link">
               Features
             </a>
 
-            <a
-              href="#journey"
-              className="nav-link"
-            >
+            <a href="#journey" className="nav-link">
               How It Works
             </a>
 
-            <a
-              href="#mission"
-              className="nav-link"
-            >
+            <a href="#mission" className="nav-link">
               Our Mission
             </a>
           </nav>
@@ -562,16 +440,10 @@ export default function Home() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
-                href={
-                  homepage.hero
-                    .primaryButtonLink
-                }
+                href={homepage.hero.primaryButtonLink}
                 className="primary-button group"
               >
-                {
-                  homepage.hero
-                    .primaryButtonText
-                }
+                {homepage.hero.primaryButtonText}
 
                 <span className="button-arrow">
                   →
@@ -579,51 +451,36 @@ export default function Home() {
               </a>
 
               <a
-                href={
-                  homepage.hero
-                    .secondaryButtonLink
-                }
+                href={homepage.hero.secondaryButtonLink}
                 className="secondary-button"
               >
-                {
-                  homepage.hero
-                    .secondaryButtonText
-                }
+                {homepage.hero.secondaryButtonText}
               </a>
             </div>
 
             <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-sm font-semibold text-[#6c6278]">
               <div className="flex items-center gap-2">
-                <span className="check-circle">
-                  ✓
-                </span>
+                <span className="check-circle">✓</span>
                 Learn
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="check-circle">
-                  ✓
-                </span>
+                <span className="check-circle">✓</span>
                 Practise
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="check-circle">
-                  ✓
-                </span>
+                <span className="check-circle">✓</span>
                 Battle
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="check-circle">
-                  ✓
-                </span>
+                <span className="check-circle">✓</span>
                 Improve
               </div>
             </div>
           </div>
 
-          {/* HERO VISUAL */}
           <div className="relative mx-auto w-full max-w-[570px] lg:ml-auto fade-up delay-one">
             <div className="hero-image-wrap">
               <img
@@ -656,9 +513,7 @@ export default function Home() {
                           index + 1
                         }`}
                         onClick={() =>
-                          setHeroImageIndex(
-                            index
-                          )
+                          setHeroImageIndex(index)
                         }
                         className={`h-1.5 rounded-full transition-all ${
                           index ===
@@ -728,22 +583,13 @@ export default function Home() {
               </p>
 
               <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
-                JAMB should not decide your
-                future because you were not
-                properly prepared.
+                JAMB should not decide your future because you were not properly prepared.
               </h2>
             </div>
 
             <div>
               <p className="max-w-2xl text-base leading-8 text-white/65 sm:text-lg">
-                Many students do not fail
-                because they cannot learn. They
-                struggle because preparation can
-                be scattered, stressful and
-                difficult to measure. JAMBMASTER
-                brings the important parts of
-                preparation into one connected
-                experience.
+                Many students do not fail because they cannot learn. They struggle because preparation can be scattered, stressful and difficult to measure. JAMBMASTER brings the important parts of preparation into one connected experience.
               </p>
 
               <div className="mt-7 grid gap-3 sm:grid-cols-3">
@@ -768,10 +614,7 @@ export default function Home() {
       </section>
 
       {/* ABOUT */}
-      <section
-        id="about"
-        className="px-5 py-20 sm:py-28"
-      >
+      <section id="about" className="px-5 py-20 sm:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div className="relative">
@@ -790,11 +633,11 @@ export default function Home() {
 
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-[#81758d]">
-                    The goal
+                    {homepage.about.noteLabel}
                   </p>
 
                   <p className="mt-1 font-black text-[#291638]">
-                    Make preparation easier.
+                    {homepage.about.noteTitle}
                   </p>
                 </div>
               </div>
@@ -814,60 +657,30 @@ export default function Home() {
               </p>
 
               <p className="section-copy">
-                From selecting four subjects and
-                setting a target score to studying
-                topics, taking CBTs, battling other
-                students and analyzing performance,
-                every part of the experience is
-                designed around one objective:
-                helping students become better
-                prepared.
+                {homepage.about.secondDescription}
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <div className="about-point">
-                  <span>01</span>
-                  <div>
-                    <strong>Student-first</strong>
-                    <p>
-                      Built around how students
-                      actually prepare.
-                    </p>
-                  </div>
-                </div>
+                {homepage.about.points.map(
+                  (point) => (
+                    <div
+                      key={point.number}
+                      className="about-point"
+                    >
+                      <span>{point.number}</span>
 
-                <div className="about-point">
-                  <span>02</span>
-                  <div>
-                    <strong>Data-driven</strong>
-                    <p>
-                      Use performance to understand
-                      what comes next.
-                    </p>
-                  </div>
-                </div>
+                      <div>
+                        <strong>
+                          {point.title}
+                        </strong>
 
-                <div className="about-point">
-                  <span>03</span>
-                  <div>
-                    <strong>Competitive</strong>
-                    <p>
-                      Turn preparation into healthy
-                      competition.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="about-point">
-                  <span>04</span>
-                  <div>
-                    <strong>Personal</strong>
-                    <p>
-                      Your subjects, goals, pace and
-                      progress matter.
-                    </p>
-                  </div>
-                </div>
+                        <p>
+                          {point.description}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -892,29 +705,16 @@ export default function Home() {
           </div>
 
           <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            <MethodCard
-              number="01"
-              title="Learn"
-              text="Build knowledge through structured subjects, topics, materials, resources and educational videos."
-            />
-
-            <MethodCard
-              number="02"
-              title="Practise"
-              text="Reinforce what you learn with questions, topic practice and realistic timed CBT experiences."
-            />
-
-            <MethodCard
-              number="03"
-              title="Compete"
-              text="Challenge yourself against other students and turn preparation into a motivating experience."
-            />
-
-            <MethodCard
-              number="04"
-              title="Improve"
-              text="Understand your results, identify weak areas and use your data to prepare more intelligently."
-            />
+            {homepage.method.steps.map(
+              (step) => (
+                <MethodCard
+                  key={step.number}
+                  number={step.number}
+                  title={step.title}
+                  text={step.text}
+                />
+              )
+            )}
           </div>
         </div>
       </section>
@@ -940,20 +740,24 @@ export default function Home() {
           </div>
 
           <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <FeatureCard
-                key={feature.number}
-                number={feature.number}
-                title={feature.title}
-                description={feature.description}
-                icon={feature.icon}
-              />
-            ))}
+            {homepage.features.items.map(
+              (feature) => (
+                <FeatureCard
+                  key={feature.number}
+                  number={feature.number}
+                  title={feature.title}
+                  description={
+                    feature.description
+                  }
+                  icon={feature.icon}
+                />
+              )
+            )}
           </div>
         </div>
       </section>
 
-      {/* LEARNING FEATURE */}
+      {/* LEARNING */}
       <section className="feature-showcase px-5 py-20 sm:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
           <div className="order-2 lg:order-1">
@@ -970,22 +774,13 @@ export default function Home() {
             </p>
 
             <ul className="feature-list">
-              <li>
-                Structured JAMB topics and learning
-                paths
-              </li>
-              <li>
-                E-textbooks and study resources
-              </li>
-              <li>
-                Educational videos and materials
-              </li>
-              <li>
-                Personal study goals and progress
-              </li>
-              <li>
-                Topic-focused preparation
-              </li>
+              {homepage.learning.bullets.map(
+                (bullet, index) => (
+                  <li key={`${bullet}-${index}`}>
+                    {bullet}
+                  </li>
+                )
+              )}
             </ul>
           </div>
 
@@ -999,14 +794,17 @@ export default function Home() {
 
               <div className="subject-panel">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#8a7d96]">
-                  Your subjects
+                  {homepage.learning.subjectsLabel}
                 </p>
 
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <span>Mathematics</span>
-                  <span>English</span>
-                  <span>Physics</span>
-                  <span>Biology</span>
+                  {homepage.learning.subjects.map(
+                    (subject) => (
+                      <span key={subject}>
+                        {subject}
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -1020,40 +818,41 @@ export default function Home() {
           <div>
             <div className="cbt-preview">
               <div className="cbt-top">
-                <span>JAMBMASTER CBT</span>
+                <span>
+                  {homepage.cbt.previewTitle}
+                </span>
+
                 <span className="timer-pill">
-                  42:18
+                  {homepage.cbt.timer}
                 </span>
               </div>
 
               <div className="cbt-body">
                 <div className="cbt-question">
                   <span>
-                    QUESTION 18 OF 60
+                    {homepage.cbt.questionLabel}
                   </span>
 
                   <h3>
-                    Which of the following best
-                    describes the relationship
-                    between...
+                    {homepage.cbt.question}
                   </h3>
 
                   <div className="answers">
-                    <div>
-                      A. Option one
-                    </div>
-
-                    <div>
-                      B. Option two
-                    </div>
-
-                    <div className="answer-selected">
-                      C. Option three
-                    </div>
-
-                    <div>
-                      D. Option four
-                    </div>
+                    {homepage.cbt.answers.map(
+                      (answer, index) => (
+                        <div
+                          key={`${answer}-${index}`}
+                          className={
+                            index ===
+                            homepage.cbt.selectedAnswer
+                              ? "answer-selected"
+                              : ""
+                          }
+                        >
+                          {answer}
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
 
@@ -1086,12 +885,14 @@ export default function Home() {
             </p>
 
             <div className="info-grid">
-              <InfoItem title="Timed CBTs" />
-              <InfoItem title="Topic practice" />
-              <InfoItem title="Mock examinations" />
-              <InfoItem title="Instant results" />
-              <InfoItem title="Question review" />
-              <InfoItem title="Performance history" />
+              {homepage.cbt.infoItems.map(
+                (item, index) => (
+                  <InfoItem
+                    key={`${item.title}-${index}`}
+                    title={item.title}
+                  />
+                )
+              )}
             </div>
           </div>
         </div>
@@ -1117,25 +918,16 @@ export default function Home() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <span className="battle-tag">
-                1 vs 1
-              </span>
-
-              <span className="battle-tag">
-                5 Players
-              </span>
-
-              <span className="battle-tag">
-                10 Players
-              </span>
-
-              <span className="battle-tag">
-                20 Players
-              </span>
-
-              <span className="battle-tag">
-                Leaderboards
-              </span>
+              {homepage.battle.tags.map(
+                (tag) => (
+                  <span
+                    key={tag}
+                    className="battle-tag"
+                  >
+                    {tag}
+                  </span>
+                )
+              )}
             </div>
           </div>
 
@@ -1143,11 +935,11 @@ export default function Home() {
             <div className="battle-board-header">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-white/45">
-                  Live battle
+                  {homepage.battle.boardLabel}
                 </p>
 
                 <h3 className="mt-1 text-xl font-black">
-                  JAMB Champions
+                  {homepage.battle.boardTitle}
                 </h3>
               </div>
 
@@ -1157,33 +949,20 @@ export default function Home() {
               </div>
             </div>
 
-            <BattleRow
-              position="01"
-              name="You"
-              score="284"
-              active
-            />
-
-            <BattleRow
-              position="02"
-              name="Player 02"
-              score="276"
-            />
-
-            <BattleRow
-              position="03"
-              name="Player 03"
-              score="263"
-            />
-
-            <BattleRow
-              position="04"
-              name="Player 04"
-              score="251"
-            />
+            {homepage.battle.players.map(
+              (player) => (
+                <BattleRow
+                  key={player.position}
+                  position={player.position}
+                  name={player.name}
+                  score={player.score}
+                  active={player.active}
+                />
+              )
+            )}
 
             <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-xs font-semibold text-white/50">
-              Compete. Learn. Improve.
+              {homepage.battle.boardFooter}
             </div>
           </div>
         </div>
@@ -1208,10 +987,14 @@ export default function Home() {
                 </p>
 
                 <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                  <AiPoint text="Explain difficult questions" />
-                  <AiPoint text="Recommend practice" />
-                  <AiPoint text="Create study plans" />
-                  <AiPoint text="Identify learning gaps" />
+                  {homepage.aiCoach.points.map(
+                    (point, index) => (
+                      <AiPoint
+                        key={`${point.text}-${index}`}
+                        text={point.text}
+                      />
+                    )
+                  )}
                 </div>
               </div>
 
@@ -1223,30 +1006,26 @@ export default function Home() {
 
                   <div>
                     <p className="font-black text-[#291638]">
-                      JAMB Coach
+                      {homepage.aiCoach.assistantName}
                     </p>
 
                     <p className="text-xs text-[#8b7f91]">
-                      Your preparation assistant
+                      {homepage.aiCoach.assistantSubtitle}
                     </p>
                   </div>
                 </div>
 
                 <div className="chat-message student-message">
-                  I keep struggling with this
-                  topic. What should I do?
+                  {homepage.aiCoach.studentMessage}
                 </div>
 
                 <div className="chat-message ai-message">
-                  Let&apos;s break it down. I can
-                  explain the concept first, then
-                  give you practice questions
-                  focused on this area.
+                  {homepage.aiCoach.assistantMessage}
                 </div>
 
                 <div className="chat-input">
                   <span>
-                    Ask your JAMB Coach...
+                    {homepage.aiCoach.inputPlaceholder}
                   </span>
 
                   <b>→</b>
@@ -1274,25 +1053,15 @@ export default function Home() {
             </p>
 
             <div className="mt-8 space-y-3">
-              <ProgressPoint
-                title="Subject mastery"
-                text="See how you are performing across your subjects."
-              />
-
-              <ProgressPoint
-                title="Weak topics"
-                text="Identify areas that require more attention."
-              />
-
-              <ProgressPoint
-                title="Score trends"
-                text="Track how your performance changes over time."
-              />
-
-              <ProgressPoint
-                title="Smart recommendations"
-                text="Know what to focus on next."
-              />
+              {homepage.analytics.points.map(
+                (point, index) => (
+                  <ProgressPoint
+                    key={`${point.title}-${index}`}
+                    title={point.title}
+                    text={point.text}
+                  />
+                )
+              )}
             </div>
           </div>
 
@@ -1300,17 +1069,22 @@ export default function Home() {
             <div className="analytics-header">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-[#8b7e95]">
-                  Performance
+                  {homepage.analytics.performanceLabel}
                 </p>
 
                 <h3 className="mt-1 text-2xl font-black text-[#251431]">
-                  Your progress
+                  {homepage.analytics.performanceTitle}
                 </h3>
               </div>
 
               <div className="score-number">
-                <strong>72%</strong>
-                <span>overall</span>
+                <strong>
+                  {homepage.analytics.score}
+                </strong>
+
+                <span>
+                  {homepage.analytics.scoreLabel}
+                </span>
               </div>
             </div>
 
@@ -1325,29 +1099,16 @@ export default function Home() {
             </div>
 
             <div className="analytics-subjects">
-              <SubjectBar
-                name="English"
-                value="82%"
-                width="82%"
-              />
-
-              <SubjectBar
-                name="Mathematics"
-                value="74%"
-                width="74%"
-              />
-
-              <SubjectBar
-                name="Physics"
-                value="68%"
-                width="68%"
-              />
-
-              <SubjectBar
-                name="Biology"
-                value="63%"
-                width="63%"
-              />
+              {homepage.analytics.subjects.map(
+                (subject) => (
+                  <SubjectBar
+                    key={subject.name}
+                    name={subject.name}
+                    value={subject.value}
+                    width={subject.width}
+                  />
+                )
+              )}
             </div>
           </div>
         </div>
@@ -1381,21 +1142,20 @@ export default function Home() {
 
                 <div>
                   <p className="text-sm font-black text-[#33213e]">
-                    Anonymous Student
+                    {homepage.community.sampleName}
                   </p>
 
                   <p className="mt-1 text-sm text-[#71667b]">
-                    Just crossed my first 250+
-                    practice score. Let&apos;s go!
+                    {homepage.community.sampleMessage}
                   </p>
 
                   <div className="mt-3 flex gap-4 text-xs font-bold text-[#8b7f92]">
                     <span>
-                      ♡ Encourage
+                      {homepage.community.encourageLabel}
                     </span>
 
                     <span>
-                      ⚔ Challenge
+                      {homepage.community.challengeLabel}
                     </span>
                   </div>
                 </div>
@@ -1408,27 +1168,26 @@ export default function Home() {
               </div>
 
               <p className="mt-7 text-xs font-bold uppercase tracking-[0.15em] text-[#a16207]">
-                Tutors & live learning
+                {homepage.tutors.eyebrow}
               </p>
 
               <h3 className="mt-3 text-3xl font-black tracking-tight text-[#251431]">
-                Learn with people who can guide
-                you.
+                {homepage.tutors.title}
               </h3>
 
               <p className="mt-4 leading-7 text-[#71667b]">
-                Students can discover tutors,
-                explore tutor profiles, compare
-                learning options, book sessions and
-                participate in private or group live
-                classes.
+                {homepage.tutors.description}
               </p>
 
               <div className="mt-8 grid grid-cols-2 gap-3">
-                <TutorFeature text="Tutor profiles" />
-                <TutorFeature text="Ratings" />
-                <TutorFeature text="Private lessons" />
-                <TutorFeature text="Live classes" />
+                {homepage.tutors.features.map(
+                  (feature) => (
+                    <TutorFeature
+                      key={feature.text}
+                      text={feature.text}
+                    />
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -1443,39 +1202,37 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
             <p className="section-eyebrow">
-              Your JAMB journey
+              {homepage.journey.eyebrow}
             </p>
 
-            <h2 className="section-title">
-              One preparation journey.
-              <br />
-              Built around you.
+            <h2 className="section-title whitespace-pre-line">
+              {homepage.journey.title}
             </h2>
 
             <p className="section-copy mx-auto">
-              JAMBMASTER connects each stage of
-              preparation so that students can move
-              forward instead of preparing without
-              knowing what to do next.
+              {homepage.journey.description}
             </p>
           </div>
 
           <div className="journey-grid mt-14">
-            {journey.map((item) => (
-              <div
-                key={item.number}
-                className="journey-item"
-              >
-                <div className="journey-number">
-                  {item.number}
-                </div>
+            {homepage.journey.steps.map(
+              (item) => (
+                <div
+                  key={item.number}
+                  className="journey-item"
+                >
+                  <div className="journey-number">
+                    {item.number}
+                  </div>
 
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
+                  <div>
+                    <h3>{item.title}</h3>
+
+                    <p>{item.text}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </div>
       </section>
@@ -1499,8 +1256,7 @@ export default function Home() {
           </p>
 
           <div className="mt-10 inline-flex rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white/80 backdrop-blur">
-            Battle JAMB. Overcome Failure. Achieve
-            Your Score.
+            {homepage.mission.badge}
           </div>
         </div>
       </section>
@@ -1510,7 +1266,7 @@ export default function Home() {
         <div className="final-cta mx-auto max-w-6xl">
           <div className="relative z-10 max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#facc15]">
-              Your preparation starts here
+              {homepage.finalCta.eyebrow}
             </p>
 
             <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white sm:text-6xl">
@@ -1522,9 +1278,7 @@ export default function Home() {
             </p>
 
             <a
-              href={
-                homepage.finalCta.buttonLink
-              }
+              href={homepage.finalCta.buttonLink}
               className="mt-8 inline-flex items-center gap-3 rounded-xl bg-white px-6 py-4 font-black text-[#5b21b6] transition hover:-translate-y-1"
             >
               {homepage.finalCta.buttonText}
@@ -1568,45 +1322,27 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap gap-5 text-sm font-semibold text-[#706579]">
-            <a
-              href="#about"
-              className="footer-link"
-            >
+            <a href="#about" className="footer-link">
               About
             </a>
 
-            <a
-              href="#features"
-              className="footer-link"
-            >
+            <a href="#features" className="footer-link">
               Features
             </a>
 
-            <a
-              href="#journey"
-              className="footer-link"
-            >
+            <a href="#journey" className="footer-link">
               How It Works
             </a>
 
-            <a
-              href="/blog"
-              className="footer-link"
-            >
+            <a href="/blog" className="footer-link">
               Blog
             </a>
 
-            <a
-              href="/login"
-              className="footer-link"
-            >
+            <a href="/login" className="footer-link">
               Login
             </a>
 
-            <a
-              href="/signup"
-              className="footer-link"
-            >
+            <a href="/signup" className="footer-link">
               Sign Up
             </a>
           </div>
@@ -1620,10 +1356,6 @@ export default function Home() {
   );
 }
 
-/*
- * Allows the CMS title to retain a strong visual hierarchy.
- * If the title contains line breaks, they are respected.
- */
 function formatHeroTitle(title: string) {
   const parts = title.split("\n");
 
