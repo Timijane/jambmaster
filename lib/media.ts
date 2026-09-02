@@ -11,6 +11,7 @@ import {
   setDoc,
   Timestamp,
 } from "firebase/firestore";
+
 import { db } from "./firebase";
 
 export type MediaPurpose =
@@ -148,12 +149,9 @@ export async function saveMediaItem(
   return mediaRef.id;
 }
 
-export async function deleteMediaItem(
-  mediaId: string
-) {
-  await deleteDoc(doc(db, "media", mediaId));
-}
-
+/**
+ * Assign an uploaded media item to its intended website location.
+ */
 export async function assignMediaToHomepage(
   media: MediaItem
 ) {
@@ -163,6 +161,9 @@ export async function assignMediaToHomepage(
     "homepage"
   );
 
+  /**
+   * LOGO
+   */
   if (media.purpose === "logo") {
     await setDoc(
       doc(db, "siteSettings", "site"),
@@ -177,6 +178,9 @@ export async function assignMediaToHomepage(
     return;
   }
 
+  /**
+   * FAVICON
+   */
   if (media.purpose === "favicon") {
     await setDoc(
       doc(db, "siteSettings", "site"),
@@ -191,6 +195,9 @@ export async function assignMediaToHomepage(
     return;
   }
 
+  /**
+   * HERO IMAGES
+   */
   if (
     media.purpose === "hero_1" ||
     media.purpose === "hero_2" ||
@@ -211,7 +218,8 @@ export async function assignMediaToHomepage(
       ? homepageSnapshot.data()
       : {};
 
-    const existingHero = existingData.hero || {};
+    const existingHero =
+      existingData.hero || {};
 
     const existingImages = Array.isArray(
       existingHero.images
@@ -219,11 +227,22 @@ export async function assignMediaToHomepage(
       ? [...existingHero.images]
       : [];
 
+    const existingMediaIds = Array.isArray(
+      existingHero.imageMediaIds
+    )
+      ? [...existingHero.imageMediaIds]
+      : [];
+
     while (existingImages.length < 3) {
       existingImages.push("");
     }
 
+    while (existingMediaIds.length < 3) {
+      existingMediaIds.push(null);
+    }
+
     existingImages[slot] = media.url;
+    existingMediaIds[slot] = media.id;
 
     await setDoc(
       homepageRef,
@@ -231,6 +250,7 @@ export async function assignMediaToHomepage(
         hero: {
           ...existingHero,
           images: existingImages,
+          imageMediaIds: existingMediaIds,
         },
       },
       { merge: true }
@@ -239,6 +259,9 @@ export async function assignMediaToHomepage(
     return;
   }
 
+  /**
+   * SINGLE IMAGE HOMEPAGE SECTIONS
+   */
   const sectionMap: Record<
     string,
     string
@@ -253,7 +276,8 @@ export async function assignMediaToHomepage(
     mission: "mission",
   };
 
-  const section = sectionMap[media.purpose];
+  const section =
+    sectionMap[media.purpose];
 
   if (!section) {
     return;
@@ -264,8 +288,259 @@ export async function assignMediaToHomepage(
     {
       [section]: {
         image: media.url,
+        imageMediaId: media.id,
       },
     },
     { merge: true }
   );
+}
+
+/**
+ * Remove the media assignment from the website
+ * before deleting the media record.
+ *
+ * This is what allows the homepage to fall back
+ * to its original/default image.
+ */
+async function removeMediaAssignment(
+  media: MediaItem
+) {
+  const homepageRef = doc(
+    db,
+    "siteSettings",
+    "homepage"
+  );
+
+  /**
+   * LOGO
+   */
+  if (media.purpose === "logo") {
+    const siteRef = doc(
+      db,
+      "siteSettings",
+      "site"
+    );
+
+    const snapshot = await getDoc(siteRef);
+
+    if (!snapshot.exists()) {
+      return;
+    }
+
+    const data = snapshot.data();
+
+    if (
+      data.logoMediaId === media.id ||
+      data.logo === media.url
+    ) {
+      await setDoc(
+        siteRef,
+        {
+          logo: "",
+          logoMediaId: "",
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    }
+
+    return;
+  }
+
+  /**
+   * FAVICON
+   */
+  if (media.purpose === "favicon") {
+    const siteRef = doc(
+      db,
+      "siteSettings",
+      "site"
+    );
+
+    const snapshot = await getDoc(siteRef);
+
+    if (!snapshot.exists()) {
+      return;
+    }
+
+    const data = snapshot.data();
+
+    if (
+      data.faviconMediaId === media.id ||
+      data.favicon === media.url
+    ) {
+      await setDoc(
+        siteRef,
+        {
+          favicon: "",
+          faviconMediaId: "",
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    }
+
+    return;
+  }
+
+  /**
+   * HERO
+   */
+  if (
+    media.purpose === "hero_1" ||
+    media.purpose === "hero_2" ||
+    media.purpose === "hero_3"
+  ) {
+    const slot =
+      media.purpose === "hero_1"
+        ? 0
+        : media.purpose === "hero_2"
+          ? 1
+          : 2;
+
+    const snapshot = await getDoc(
+      homepageRef
+    );
+
+    if (!snapshot.exists()) {
+      return;
+    }
+
+    const data = snapshot.data();
+    const hero = data.hero || {};
+
+    const images = Array.isArray(hero.images)
+      ? [...hero.images]
+      : [];
+
+    const mediaIds = Array.isArray(
+      hero.imageMediaIds
+    )
+      ? [...hero.imageMediaIds]
+      : [];
+
+    const currentImage = images[slot];
+    const currentMediaId = mediaIds[slot];
+
+    /**
+     * Only remove the assignment if this exact
+     * media item is still assigned to that slot.
+     *
+     * This prevents deleting an old image from
+     * accidentally removing a newer replacement.
+     */
+    if (
+      currentMediaId === media.id ||
+      currentImage === media.url
+    ) {
+      images[slot] = "";
+      mediaIds[slot] = null;
+
+      await setDoc(
+        homepageRef,
+        {
+          hero: {
+            ...hero,
+            images,
+            imageMediaIds: mediaIds,
+          },
+        },
+        { merge: true }
+      );
+    }
+
+    return;
+  }
+
+  /**
+   * OTHER HOMEPAGE SECTIONS
+   */
+  const sectionMap: Record<
+    string,
+    string
+  > = {
+    about: "about",
+    learning: "learning",
+    cbt: "cbt",
+    battle: "battle",
+    aiCoach: "aiCoach",
+    analytics: "analytics",
+    community: "community",
+    mission: "mission",
+  };
+
+  const section =
+    sectionMap[media.purpose];
+
+  if (!section) {
+    return;
+  }
+
+  const snapshot = await getDoc(
+    homepageRef
+  );
+
+  if (!snapshot.exists()) {
+    return;
+  }
+
+  const data = snapshot.data();
+  const sectionData =
+    data[section] || {};
+
+  if (
+    sectionData.imageMediaId === media.id ||
+    sectionData.image === media.url
+  ) {
+    await setDoc(
+      homepageRef,
+      {
+        [section]: {
+          ...sectionData,
+          image: "",
+          imageMediaId: "",
+        },
+      },
+      { merge: true }
+    );
+  }
+}
+
+/**
+ * Delete media safely.
+ */
+export async function deleteMediaItem(
+  mediaId: string
+) {
+  const mediaRef = doc(
+    db,
+    "media",
+    mediaId
+  );
+
+  const snapshot = await getDoc(
+    mediaRef
+  );
+
+  if (!snapshot.exists()) {
+    return;
+  }
+
+  const media = {
+    id: mediaId,
+    ...(snapshot.data() as Omit<
+      MediaItem,
+      "id"
+    >),
+  };
+
+  /**
+   * First remove the website assignment.
+   */
+  await removeMediaAssignment(media);
+
+  /**
+   * Then remove the Firestore media record.
+   */
+  await deleteDoc(mediaRef);
 }
