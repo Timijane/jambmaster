@@ -62,24 +62,18 @@ export default function MediaManagerPage() {
     useRef<HTMLInputElement | null>(null);
 
   const [user, setUser] = useState<User | null>(null);
-  const [checkingAuth, setCheckingAuth] =
-    useState(true);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [assetLocations, setAssetLocations] =
     useState<AssetLocation[]>([]);
 
-  const [loadingMedia, setLoadingMedia] =
-    useState(true);
-
+  const [loadingMedia, setLoadingMedia] = useState(true);
   const [loadingAssignments, setLoadingAssignments] =
     useState(true);
 
-  const [uploading, setUploading] =
-    useState(false);
-
-  const [uploadProgress, setUploadProgress] =
-    useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [selectedPurpose, setSelectedPurpose] =
     useState<MediaPurpose>("other");
@@ -109,8 +103,7 @@ export default function MediaManagerPage() {
             currentUser.uid
           );
 
-          const adminSnapshot =
-            await getDoc(adminRef);
+          const adminSnapshot = await getDoc(adminRef);
 
           if (
             !adminSnapshot.exists() ||
@@ -159,7 +152,6 @@ export default function MediaManagerPage() {
 
     try {
       const items = await getMediaItems();
-
       setMedia(items);
     } catch (err) {
       console.error(
@@ -216,9 +208,7 @@ export default function MediaManagerPage() {
           purpose: "logo",
           image: site.logo || "",
           mediaId: site.logoMediaId || "",
-          assigned: Boolean(
-            site.logoMediaId
-          ),
+          assigned: Boolean(site.logoMediaId),
         },
 
         {
@@ -318,7 +308,7 @@ export default function MediaManagerPage() {
           "aiCoach",
           "AI JAMB Coach",
           homepage.aiCoach,
-          "ai_coach"
+          "aiCoach"
         ),
 
         createHomepageAsset(
@@ -451,8 +441,7 @@ export default function MediaManagerPage() {
         index < selectedFiles.length;
         index++
       ) {
-        const file =
-          selectedFiles[index];
+        const file = selectedFiles[index];
 
         validateImage(file);
 
@@ -583,9 +572,7 @@ export default function MediaManagerPage() {
     setError("");
 
     try {
-      await deleteMediaItem(
-        item.id
-      );
+      await deleteMediaItem(item.id);
 
       setMedia((current) =>
         current.filter(
@@ -648,9 +635,7 @@ export default function MediaManagerPage() {
   function selectPurpose(
     purpose: MediaPurpose
   ) {
-    setSelectedPurpose(
-      purpose
-    );
+    setSelectedPurpose(purpose);
 
     setMessage("");
     setError("");
@@ -665,8 +650,7 @@ export default function MediaManagerPage() {
     setSelectedFiles([]);
 
     if (fileInputRef.current) {
-      fileInputRef.current.value =
-        "";
+      fileInputRef.current.value = "";
     }
   }
 
@@ -741,7 +725,6 @@ export default function MediaManagerPage() {
       </header>
 
       <section className="mx-auto max-w-7xl px-5 py-8">
-        {/* ASSET MAP */}
         <section className="rounded-3xl border border-violet-100 bg-white p-6 shadow-sm md:p-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -816,7 +799,6 @@ export default function MediaManagerPage() {
           </div>
         </section>
 
-        {/* UPLOAD */}
         <section className="mt-8 rounded-3xl border border-violet-100 bg-white p-6 shadow-sm md:p-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-600">
@@ -893,8 +875,7 @@ export default function MediaManagerPage() {
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-violet-800">
-                    {selectedFiles.length >
-                    0
+                    {selectedFiles.length > 0
                       ? `${selectedFiles.length} image${
                           selectedFiles.length !==
                           1
@@ -922,21 +903,15 @@ export default function MediaManagerPage() {
             type="file"
             accept="image/*"
             multiple={
-              selectedPurpose !==
-                "hero_1" &&
-              selectedPurpose !==
-                "hero_2" &&
-              selectedPurpose !==
-                "hero_3"
+              selectedPurpose !== "hero_1" &&
+              selectedPurpose !== "hero_2" &&
+              selectedPurpose !== "hero_3"
             }
             className="hidden"
-            onChange={
-              handleFileSelection
-            }
+            onChange={handleFileSelection}
           />
 
-          {selectedFiles.length >
-            0 && (
+          {selectedFiles.length > 0 && (
             <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-400">
@@ -946,9 +921,7 @@ export default function MediaManagerPage() {
                 {!uploading && (
                   <button
                     type="button"
-                    onClick={
-                      clearSelection
-                    }
+                    onClick={clearSelection}
                     className="text-xs font-bold text-red-600 hover:text-red-700"
                   >
                     Clear
@@ -982,15 +955,11 @@ export default function MediaManagerPage() {
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
-              onClick={
-                handleUpload
-              }
+              onClick={handleUpload}
               disabled={
                 uploading ||
-                selectedFiles.length ===
-                  0 ||
-                selectedPurpose ===
-                  "other"
+                selectedFiles.length === 0 ||
+                selectedPurpose === "other"
               }
               className="rounded-xl bg-gradient-to-r from-violet-700 to-purple-900 px-7 py-3.5 font-black text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -999,14 +968,11 @@ export default function MediaManagerPage() {
                 : "Upload to Website"}
             </button>
 
-            {selectedFiles.length >
-              0 &&
+            {selectedFiles.length > 0 &&
               !uploading && (
                 <button
                   type="button"
-                  onClick={
-                    clearSelection
-                  }
+                  onClick={clearSelection}
                   className="rounded-xl border border-gray-200 bg-white px-7 py-3.5 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
                 >
                   Clear Selection
@@ -1038,7 +1004,6 @@ export default function MediaManagerPage() {
           )}
         </section>
 
-        {/* STATUS */}
         {message && (
           <div className="mt-6 rounded-2xl border border-green-100 bg-green-50 px-5 py-4 text-sm font-semibold text-green-700">
             {message}
@@ -1051,7 +1016,6 @@ export default function MediaManagerPage() {
           </div>
         )}
 
-        {/* LIBRARY */}
         <section className="mt-10">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
@@ -1079,8 +1043,7 @@ export default function MediaManagerPage() {
 
           {loadingMedia ? (
             <LoadingBox text="Loading media library..." />
-          ) : media.length ===
-            0 ? (
+          ) : media.length === 0 ? (
             <EmptyLibrary
               onChoose={() =>
                 fileInputRef.current?.click()
@@ -1267,9 +1230,7 @@ function MediaCard({
         </p>
 
         <p className="mt-1 text-xs text-gray-400">
-          {formatBytes(
-            item.bytes
-          )}
+          {formatBytes(item.bytes)}
 
           {item.width &&
           item.height
@@ -1524,27 +1485,21 @@ async function uploadToCloudinary(
     );
   }
 
-  const formData =
-    new FormData();
+  const formData = new FormData();
 
-  formData.append(
-    "file",
-    file
-  );
-
+  formData.append("file", file);
   formData.append(
     "upload_preset",
     CLOUDINARY_UPLOAD_PRESET
   );
 
-  const response =
-    await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
 
   const result =
     (await response.json()) as CloudinaryUploadResult & {
@@ -1600,15 +1555,15 @@ function getHomepageSlot(
   purpose: MediaPurpose
 ): number | null {
   if (purpose === "hero_1") {
-    return 1;
+    return 0;
   }
 
   if (purpose === "hero_2") {
-    return 2;
+    return 1;
   }
 
   if (purpose === "hero_3") {
-    return 3;
+    return 2;
   }
 
   return null;
@@ -1628,7 +1583,10 @@ function getPurposeLabel(
 function formatBytes(
   bytes: number
 ): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) {
+  if (
+    !Number.isFinite(bytes) ||
+    bytes <= 0
+  ) {
     return "0 Bytes";
   }
 
