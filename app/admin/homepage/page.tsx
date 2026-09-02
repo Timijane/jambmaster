@@ -308,11 +308,27 @@ export default function HomepageEditor() {
       | "imageRotationSeconds",
     value: number
   ) {
-    updateSection(
-      section,
-      field,
-      Math.max(1, value)
-    );
+    const safeValue = Math.max(1, value);
+
+    if (section === "announcement") {
+      setData((current) => ({
+        ...current,
+        announcement: {
+          ...current.announcement,
+          rotationSeconds: safeValue,
+        },
+      }));
+
+      return;
+    }
+
+    setData((current) => ({
+      ...current,
+      hero: {
+        ...current.hero,
+        imageRotationSeconds: safeValue,
+      },
+    }));
   }
 
   function updateBoolean(
