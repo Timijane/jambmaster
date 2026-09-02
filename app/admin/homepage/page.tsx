@@ -11,6 +11,7 @@ export default function HomepageEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadHomepage() {
@@ -19,10 +20,72 @@ export default function HomepageEditor() {
         const snapshot = await getDoc(ref);
 
         if (snapshot.exists()) {
-          setData(snapshot.data() as HomepageSettings);
+          const savedData = snapshot.data() as Partial<HomepageSettings>;
+
+          setData({
+            ...defaultHomepage,
+            ...savedData,
+            announcement: {
+              ...defaultHomepage.announcement,
+              ...(savedData.announcement || {}),
+            },
+            hero: {
+              ...defaultHomepage.hero,
+              ...(savedData.hero || {}),
+            },
+            about: {
+              ...defaultHomepage.about,
+              ...(savedData.about || {}),
+            },
+            method: {
+              ...defaultHomepage.method,
+              ...(savedData.method || {}),
+            },
+            features: {
+              ...defaultHomepage.features,
+              ...(savedData.features || {}),
+            },
+            learning: {
+              ...defaultHomepage.learning,
+              ...(savedData.learning || {}),
+            },
+            cbt: {
+              ...defaultHomepage.cbt,
+              ...(savedData.cbt || {}),
+            },
+            battle: {
+              ...defaultHomepage.battle,
+              ...(savedData.battle || {}),
+            },
+            aiCoach: {
+              ...defaultHomepage.aiCoach,
+              ...(savedData.aiCoach || {}),
+            },
+            analytics: {
+              ...defaultHomepage.analytics,
+              ...(savedData.analytics || {}),
+            },
+            community: {
+              ...defaultHomepage.community,
+              ...(savedData.community || {}),
+            },
+            mission: {
+              ...defaultHomepage.mission,
+              ...(savedData.mission || {}),
+            },
+            finalCta: {
+              ...defaultHomepage.finalCta,
+              ...(savedData.finalCta || {}),
+            },
+            footer: {
+              ...defaultHomepage.footer,
+              ...(savedData.footer || {}),
+            },
+          });
         }
-      } catch (error) {
-        console.error("Failed to load homepage:", error);
+      } catch (err) {
+        console.error("Failed to load homepage:", err);
+        setError("Unable to load homepage settings.");
       } finally {
         setLoading(false);
       }
@@ -34,6 +97,7 @@ export default function HomepageEditor() {
   async function saveHomepage() {
     setSaving(true);
     setSaved(false);
+    setError("");
 
     try {
       await setDoc(doc(db, "siteSettings", "homepage"), data);
@@ -43,48 +107,79 @@ export default function HomepageEditor() {
       setTimeout(() => {
         setSaved(false);
       }, 3000);
-    } catch (error) {
-      console.error("Failed to save homepage:", error);
-      alert("Unable to save homepage.");
+    } catch (err) {
+      console.error("Failed to save homepage:", err);
+      setError("Unable to save homepage. Please try again.");
     } finally {
       setSaving(false);
     }
   }
 
-  function updateHero(
-    field: keyof HomepageSettings["hero"],
-    value: string | number | string[]
-  ) {
-    setData((current) => ({
-      ...current,
-      hero: {
-        ...current.hero,
-        [field]: value,
-      },
-    }));
-  }
-
-  function updateAnnouncement(
-    field: keyof HomepageSettings["announcement"],
-    value: boolean | number | string[]
-  ) {
-    setData((current) => ({
-      ...current,
-      announcement: {
-        ...current.announcement,
-        [field]: value,
-      },
-    }));
-  }
-
-  function updateFooter(
-    field: keyof HomepageSettings["footer"],
+  function updateSection<
+    T extends keyof HomepageSettings
+  >(
+    section: T,
+    field: keyof HomepageSettings[T],
     value: string
   ) {
     setData((current) => ({
       ...current,
-      footer: {
-        ...current.footer,
+      [section]: {
+        ...(current[section] as object),
+        [field]: value,
+      },
+    }));
+  }
+
+  function updateNumber(
+    section: "announcement" | "hero",
+    field: "rotationSeconds" | "imageRotationSeconds",
+    value: number
+  ) {
+    setData((current) => ({
+      ...current,
+      [section]: {
+        ...current[section],
+        [field]: value,
+      },
+    }));
+  }
+
+  function updateAnnouncementItems(value: string) {
+    setData((current) => ({
+      ...current,
+      announcement: {
+        ...current.announcement,
+        items: value
+          .split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean),
+      },
+    }));
+  }
+
+  function updateHeroImages(value: string) {
+    setData((current) => ({
+      ...current,
+      hero: {
+        ...current.hero,
+        images: value
+          .split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean),
+      },
+    }));
+  }
+
+  function updateBoolean(
+    section: "announcement",
+    field: "enabled",
+    value: boolean
+  ) {
+    setData((current) => ({
+      ...current,
+      [section]: {
+        ...current[section],
         [field]: value,
       },
     }));
@@ -93,9 +188,13 @@ export default function HomepageEditor() {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f7f5ff]">
-        <p className="font-semibold text-violet-700">
-          Loading Homepage Editor...
-        </p>
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-violet-200 border-t-violet-700" />
+
+          <p className="font-bold text-violet-700">
+            Loading Homepage Editor...
+          </p>
+        </div>
       </main>
     );
   }
@@ -103,39 +202,75 @@ export default function HomepageEditor() {
   return (
     <main className="min-h-screen bg-[#f7f5ff]">
       <header className="sticky top-0 z-50 border-b border-violet-100 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-600">
               JAMBMASTER CMS
             </p>
 
-            <h1 className="text-xl font-black text-gray-950">
+            <h1 className="text-xl font-black text-gray-950 sm:text-2xl">
               Homepage Editor
             </h1>
           </div>
 
-          <button
-            onClick={saveHomepage}
-            disabled={saving}
-            className="rounded-xl bg-violet-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:bg-violet-800 disabled:opacity-60"
-          >
-            {saving ? "Saving..." : saved ? "Saved ✓" : "Save Changes"}
-          </button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => window.open("/", "_blank")}
+              className="hidden rounded-xl border border-violet-200 bg-white px-4 py-3 text-sm font-bold text-violet-700 transition hover:bg-violet-50 sm:block"
+            >
+              View Website
+            </button>
+
+            <button
+              type="button"
+              onClick={saveHomepage}
+              disabled={saving}
+              className="rounded-xl bg-violet-700 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-60 sm:px-5"
+            >
+              {saving
+                ? "Saving..."
+                : saved
+                  ? "Saved ✓"
+                  : "Save Changes"}
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl space-y-8 px-5 py-8">
+      <div className="mx-auto max-w-7xl space-y-8 px-5 py-8">
+        {error && (
+          <div className="rounded-2xl border border-red-100 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
+            {error}
+          </div>
+        )}
 
-        {/* Announcement */}
+        <div className="rounded-2xl border border-violet-100 bg-gradient-to-r from-violet-700 to-purple-900 p-6 text-white shadow-lg">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-200">
+            Website Content Management
+          </p>
+
+          <h2 className="mt-2 text-2xl font-black">
+            Control your entire homepage
+          </h2>
+
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-violet-100">
+            Every major section below is connected to the public
+            JAMBMASTER homepage. Change the content, save it, and the
+            website will use the updated information.
+          </p>
+        </div>
+
+        {/* ANNOUNCEMENT */}
         <EditorSection
           title="Moving Announcement"
-          description="Control the announcement displayed at the top of the homepage."
+          description="Control the announcement bar displayed at the top of the homepage."
         >
           <Toggle
             label="Show announcement"
             value={data.announcement.enabled}
             onChange={(value) =>
-              updateAnnouncement("enabled", value)
+              updateBoolean("announcement", "enabled", value)
             }
           />
 
@@ -143,50 +278,53 @@ export default function HomepageEditor() {
             label="Announcements"
             value={data.announcement.items.join("\n")}
             multiline
-            onChange={(value) =>
-              updateAnnouncement(
-                "items",
-                value
-                  .split("\n")
-                  .map((item) => item.trim())
-                  .filter(Boolean)
-              )
-            }
-            help="Put each announcement on a separate line."
+            onChange={updateAnnouncementItems}
+            help="Enter one announcement per line."
           />
 
           <NumberInput
-            label="Rotation speed (seconds)"
+            label="Rotation speed"
             value={data.announcement.rotationSeconds}
             onChange={(value) =>
-              updateAnnouncement("rotationSeconds", value)
+              updateNumber(
+                "announcement",
+                "rotationSeconds",
+                value
+              )
             }
           />
         </EditorSection>
 
-        {/* Hero */}
+        {/* HERO */}
         <EditorSection
           title="Hero Section"
-          description="Edit the main section visitors see when they enter JAMBMASTER."
+          description="This is the main section visitors see when they enter JAMBMASTER."
         >
           <Input
             label="Eyebrow"
             value={data.hero.eyebrow}
-            onChange={(value) => updateHero("eyebrow", value)}
+            onChange={(value) =>
+              updateSection("hero", "eyebrow", value)
+            }
           />
 
           <Input
             label="Main heading"
             value={data.hero.title}
             multiline
-            onChange={(value) => updateHero("title", value)}
+            onChange={(value) =>
+              updateSection("hero", "title", value)
+            }
+            help="You can use line breaks to control how the heading appears."
           />
 
           <Input
             label="Description"
             value={data.hero.description}
             multiline
-            onChange={(value) => updateHero("description", value)}
+            onChange={(value) =>
+              updateSection("hero", "description", value)
+            }
           />
 
           <div className="grid gap-5 md:grid-cols-2">
@@ -194,7 +332,11 @@ export default function HomepageEditor() {
               label="Primary button text"
               value={data.hero.primaryButtonText}
               onChange={(value) =>
-                updateHero("primaryButtonText", value)
+                updateSection(
+                  "hero",
+                  "primaryButtonText",
+                  value
+                )
               }
             />
 
@@ -202,7 +344,11 @@ export default function HomepageEditor() {
               label="Primary button link"
               value={data.hero.primaryButtonLink}
               onChange={(value) =>
-                updateHero("primaryButtonLink", value)
+                updateSection(
+                  "hero",
+                  "primaryButtonLink",
+                  value
+                )
               }
             />
 
@@ -210,7 +356,11 @@ export default function HomepageEditor() {
               label="Secondary button text"
               value={data.hero.secondaryButtonText}
               onChange={(value) =>
-                updateHero("secondaryButtonText", value)
+                updateSection(
+                  "hero",
+                  "secondaryButtonText",
+                  value
+                )
               }
             />
 
@@ -218,7 +368,11 @@ export default function HomepageEditor() {
               label="Secondary button link"
               value={data.hero.secondaryButtonLink}
               onChange={(value) =>
-                updateHero("secondaryButtonLink", value)
+                updateSection(
+                  "hero",
+                  "secondaryButtonLink",
+                  value
+                )
               }
             />
           </div>
@@ -227,38 +381,190 @@ export default function HomepageEditor() {
             label="Hero image URLs"
             value={data.hero.images.join("\n")}
             multiline
-            onChange={(value) =>
-              updateHero(
-                "images",
-                value
-                  .split("\n")
-                  .map((item) => item.trim())
-                  .filter(Boolean)
-              )
-            }
-            help="Media Manager will replace this with image selection later."
+            onChange={updateHeroImages}
+            help="Enter one image URL per line. Cloudinary Media Manager will be connected later."
           />
 
           <NumberInput
-            label="Image rotation speed (seconds)"
+            label="Image rotation speed"
             value={data.hero.imageRotationSeconds}
             onChange={(value) =>
-              updateHero("imageRotationSeconds", value)
+              updateNumber(
+                "hero",
+                "imageRotationSeconds",
+                value
+              )
             }
           />
         </EditorSection>
 
-        {/* Footer */}
+        {/* ABOUT */}
+        <ContentSection
+          title="About JAMBMASTER"
+          section={data.about}
+          imageLabel="About section image"
+          onChange={(field, value) =>
+            updateSection("about", field, value)
+          }
+        />
+
+        {/* METHOD */}
+        <TextOnlySection
+          title="JAMBMASTER Method"
+          section={data.method}
+          onChange={(field, value) =>
+            updateSection("method", field, value)
+          }
+        />
+
+        {/* FEATURES */}
+        <TextOnlySection
+          title="Features Section"
+          section={data.features}
+          onChange={(field, value) =>
+            updateSection("features", field, value)
+          }
+        />
+
+        {/* LEARNING */}
+        <ContentSection
+          title="Learning Section"
+          section={data.learning}
+          imageLabel="Learning section image"
+          onChange={(field, value) =>
+            updateSection("learning", field, value)
+          }
+        />
+
+        {/* CBT */}
+        <ContentSection
+          title="CBT Practice Section"
+          section={data.cbt}
+          imageLabel="CBT section image"
+          onChange={(field, value) =>
+            updateSection("cbt", field, value)
+          }
+        />
+
+        {/* BATTLE */}
+        <ContentSection
+          title="Battle Arena Section"
+          section={data.battle}
+          imageLabel="Battle section image"
+          onChange={(field, value) =>
+            updateSection("battle", field, value)
+          }
+        />
+
+        {/* AI */}
+        <ContentSection
+          title="AI JAMB Coach Section"
+          section={data.aiCoach}
+          imageLabel="AI Coach section image"
+          onChange={(field, value) =>
+            updateSection("aiCoach", field, value)
+          }
+        />
+
+        {/* ANALYTICS */}
+        <ContentSection
+          title="Analytics Section"
+          section={data.analytics}
+          imageLabel="Analytics section image"
+          onChange={(field, value) =>
+            updateSection("analytics", field, value)
+          }
+        />
+
+        {/* COMMUNITY */}
+        <ContentSection
+          title="Community Section"
+          section={data.community}
+          imageLabel="Community section image"
+          onChange={(field, value) =>
+            updateSection("community", field, value)
+          }
+        />
+
+        {/* MISSION */}
+        <ContentSection
+          title="Mission Section"
+          section={data.mission}
+          imageLabel="Mission section image"
+          onChange={(field, value) =>
+            updateSection("mission", field, value)
+          }
+        />
+
+        {/* FINAL CTA */}
+        <EditorSection
+          title="Final Call To Action"
+          description="Control the final conversion section before the footer."
+        >
+          <Input
+            label="Title"
+            value={data.finalCta.title}
+            multiline
+            onChange={(value) =>
+              updateSection("finalCta", "title", value)
+            }
+          />
+
+          <Input
+            label="Description"
+            value={data.finalCta.description}
+            multiline
+            onChange={(value) =>
+              updateSection(
+                "finalCta",
+                "description",
+                value
+              )
+            }
+          />
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <Input
+              label="Button text"
+              value={data.finalCta.buttonText}
+              onChange={(value) =>
+                updateSection(
+                  "finalCta",
+                  "buttonText",
+                  value
+                )
+              }
+            />
+
+            <Input
+              label="Button link"
+              value={data.finalCta.buttonLink}
+              onChange={(value) =>
+                updateSection(
+                  "finalCta",
+                  "buttonLink",
+                  value
+                )
+              }
+            />
+          </div>
+        </EditorSection>
+
+        {/* FOOTER */}
         <EditorSection
           title="Footer"
-          description="Manage the text displayed at the bottom of the website."
+          description="Manage the information displayed at the bottom of the website."
         >
           <Input
             label="Footer description"
             value={data.footer.description}
             multiline
             onChange={(value) =>
-              updateFooter("description", value)
+              updateSection(
+                "footer",
+                "description",
+                value
+              )
             }
           />
 
@@ -266,7 +572,11 @@ export default function HomepageEditor() {
             label="Managed by"
             value={data.footer.managedBy}
             onChange={(value) =>
-              updateFooter("managedBy", value)
+              updateSection(
+                "footer",
+                "managedBy",
+                value
+              )
             }
           />
 
@@ -274,25 +584,140 @@ export default function HomepageEditor() {
             label="Copyright"
             value={data.footer.copyright}
             onChange={(value) =>
-              updateFooter("copyright", value)
+              updateSection(
+                "footer",
+                "copyright",
+                value
+              )
             }
           />
         </EditorSection>
 
-        <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5">
-          <p className="text-sm font-bold text-violet-900">
-            More homepage controls are coming into this editor as we
-            connect the remaining sections and the Media Manager.
+        <div className="rounded-2xl border border-green-100 bg-green-50 p-5">
+          <p className="text-sm font-bold text-green-900">
+            Homepage CMS connected
           </p>
 
-          <p className="mt-2 text-sm leading-6 text-violet-700">
-            Your existing homepage design will remain intact while we
-            progressively move its content into the CMS.
+          <p className="mt-1 text-sm leading-6 text-green-700">
+            Changes saved here are stored in Firestore and used by
+            the public JAMBMASTER homepage.
           </p>
         </div>
-
       </div>
     </main>
+  );
+}
+
+type TextSection = {
+  eyebrow: string;
+  title: string;
+  description: string;
+};
+
+type ContentSectionData = TextSection & {
+  image: string;
+};
+
+function ContentSection({
+  title,
+  section,
+  imageLabel,
+  onChange,
+}: {
+  title: string;
+  section: ContentSectionData;
+  imageLabel: string;
+  onChange: (
+    field: keyof ContentSectionData,
+    value: string
+  ) => void;
+}) {
+  return (
+    <EditorSection
+      title={title}
+      description={`Edit the text and image used in the ${title.toLowerCase()}.`}
+    >
+      <Input
+        label="Eyebrow"
+        value={section.eyebrow}
+        onChange={(value) => onChange("eyebrow", value)}
+      />
+
+      <Input
+        label="Title"
+        value={section.title}
+        multiline
+        onChange={(value) => onChange("title", value)}
+      />
+
+      <Input
+        label="Description"
+        value={section.description}
+        multiline
+        onChange={(value) =>
+          onChange("description", value)
+        }
+      />
+
+      <Input
+        label={imageLabel}
+        value={section.image}
+        onChange={(value) => onChange("image", value)}
+        help="Cloudinary Media Manager will replace direct URL entry later."
+      />
+
+      {section.image && (
+        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
+          <img
+            src={section.image}
+            alt={`${title} preview`}
+            className="h-52 w-full object-cover"
+          />
+        </div>
+      )}
+    </EditorSection>
+  );
+}
+
+function TextOnlySection({
+  title,
+  section,
+  onChange,
+}: {
+  title: string;
+  section: TextSection;
+  onChange: (
+    field: keyof TextSection,
+    value: string
+  ) => void;
+}) {
+  return (
+    <EditorSection
+      title={title}
+      description={`Edit the text displayed in the ${title.toLowerCase()}.`}
+    >
+      <Input
+        label="Eyebrow"
+        value={section.eyebrow}
+        onChange={(value) => onChange("eyebrow", value)}
+      />
+
+      <Input
+        label="Title"
+        value={section.title}
+        multiline
+        onChange={(value) => onChange("title", value)}
+      />
+
+      <Input
+        label="Description"
+        value={section.description}
+        multiline
+        onChange={(value) =>
+          onChange("description", value)
+        }
+      />
+    </EditorSection>
   );
 }
 
@@ -306,13 +731,13 @@ function EditorSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-violet-100 bg-white p-6 shadow-sm md:p-8">
+    <section className="rounded-3xl border border-violet-100 bg-white p-6 shadow-sm md:p-8">
       <div className="mb-7">
         <h2 className="text-xl font-black text-gray-950">
           {title}
         </h2>
 
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm leading-6 text-gray-500">
           {description}
         </p>
       </div>
@@ -346,20 +771,24 @@ function Input({
       {multiline ? (
         <textarea
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) =>
+            onChange(event.target.value)
+          }
           rows={5}
-          className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-violet-600 focus:bg-white focus:ring-4 focus:ring-violet-100"
+          className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-6 text-gray-900 outline-none transition focus:border-violet-600 focus:bg-white focus:ring-4 focus:ring-violet-100"
         />
       ) : (
         <input
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) =>
+            onChange(event.target.value)
+          }
           className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-violet-600 focus:bg-white focus:ring-4 focus:ring-violet-100"
         />
       )}
 
       {help && (
-        <p className="mt-2 text-xs text-gray-400">
+        <p className="mt-2 text-xs leading-5 text-gray-400">
           {help}
         </p>
       )}
@@ -414,6 +843,8 @@ function Toggle({
       <button
         type="button"
         onClick={() => onChange(!value)}
+        aria-label={label}
+        aria-pressed={value}
         className={`relative h-7 w-12 rounded-full transition ${
           value ? "bg-violet-700" : "bg-gray-300"
         }`}
