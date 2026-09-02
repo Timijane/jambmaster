@@ -8,6 +8,7 @@ export type HomepageSettings = {
     secondaryButtonText: string;
     secondaryButtonLink: string;
     images: string[];
+    imageMediaIds?: (string | null)[];
     imageRotationSeconds: number;
   };
 
@@ -22,6 +23,7 @@ export type HomepageSettings = {
     title: string;
     description: string;
     image: string;
+    imageMediaId?: string;
   };
 
   method: {
@@ -41,6 +43,7 @@ export type HomepageSettings = {
     title: string;
     description: string;
     image: string;
+    imageMediaId?: string;
   };
 
   cbt: {
@@ -48,6 +51,7 @@ export type HomepageSettings = {
     title: string;
     description: string;
     image: string;
+    imageMediaId?: string;
   };
 
   battle: {
@@ -55,6 +59,7 @@ export type HomepageSettings = {
     title: string;
     description: string;
     image: string;
+    imageMediaId?: string;
   };
 
   aiCoach: {
@@ -62,6 +67,7 @@ export type HomepageSettings = {
     title: string;
     description: string;
     image: string;
+    imageMediaId?: string;
   };
 
   analytics: {
@@ -69,6 +75,7 @@ export type HomepageSettings = {
     title: string;
     description: string;
     image: string;
+    imageMediaId?: string;
   };
 
   community: {
@@ -76,6 +83,7 @@ export type HomepageSettings = {
     title: string;
     description: string;
     image: string;
+    imageMediaId?: string;
   };
 
   mission: {
@@ -83,6 +91,7 @@ export type HomepageSettings = {
     title: string;
     description: string;
     image: string;
+    imageMediaId?: string;
   };
 
   finalCta: {
